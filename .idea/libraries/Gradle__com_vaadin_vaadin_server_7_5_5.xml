@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.vaadin:vaadin-server:7.5.5">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.vaadin/vaadin-server/7.5.5/4e1518588fc74b053f289bd2bac4fc2b6d62ff0d/vaadin-server-7.5.5.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.vaadin/vaadin-server/7.5.5/7de6733d9b9443197437cf990a984146fd8ff028/vaadin-server-7.5.5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="associations-0.1.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/associations-0.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/vaadin-builder-0.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/vaadin-spring-ext-core-0.0.7-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/vaadin-spring-ext-security-0.0.7-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
