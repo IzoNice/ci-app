@@ -38,6 +38,7 @@ import static VaadinBuilder.C
 import static VaadinBuilder.F
 
 @SpringUI(path = '/')
+
 @Theme('valo')
 class CiView extends UI {
 

@@ -27,7 +27,6 @@
 package de.fh_zwickau.spr.crinc.repository;
 
 import de.fh_zwickau.spr.crinc.domain.Actor;
-import de.fh_zwickau.spr.crinc.domain.Country;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ActorRepository extends JpaRepository<Actor, Long> {

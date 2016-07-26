@@ -70,10 +70,10 @@ class CIRelationshipModelSpec extends Specification {
     private FieldOfContactRepository fieldOfContactRepository
 
     @Transactional
-    def "An Author can create two CIs, one of them with two Mediums and sets value to all relations. \"To n\" relations are tested by 2 inputs"() {
+    def "A User can create n CIs. CI has toOne and toMany relations. N is substituted by 2"() {
 
-        given: "a User, two CIs, three txts, a language, a typeOfInteraction, two actors, two actorTypes, " +
-                "two origins, a country, two hotspots, two contactFields"
+        given: "1 User, 2 CIs, 3 txts, 1 language, 1 typeOfInteraction, 2 actors, 2 actorTypes, " +
+                "2 origins, 2 country, 2 hotspots, 2 contactFields"
         def usr = new User([name: 'TestAuthor', password: 'pw'])
 
         def ci0 = new CriticalIncident(
@@ -92,30 +92,21 @@ class CIRelationshipModelSpec extends Specification {
         def ciTxt2 = new Text([
                 story: "Test Story 2", storyType: Text.StoryType.PRIMARY_FIRST_PERSON
         ])
-
         def langDE = languageRepository.findByLabelLike('Deut%')[0]
-
         def toi = typeOfInteractionRepository.getOne(2l)
-
         def actor0 = new Actor()
         def actor1 = new Actor()
-
         def actorType0 = actorTypeRepository.findByLabelLike('Ki%')[0]
         def actorType1 = actorTypeRepository.findByLabelLike('ano%')[0]
-
         def origin0 = originRepository.findByLabelLike('Sow%')[0]
         def origin1 = originRepository.findByLabelLike('Irl%')[0]
-
         def countryDE = countryRepository.findByNameLike('Deu')[0]
-
         def hots0 = hotspotRepository.findByLabelLike('Begr%')[0]
         def hots1 = hotspotRepository.findByLabelLike('Hum%')[0]
-
         def contactField0 = fieldOfContactRepository.findByLabelLike('Freun%')[0]
         def contactField1 = fieldOfContactRepository.findByLabelLike('Disc%')[0]
 
-        when: "the user becomes an author, the CIs get related and saveAndFlushed"
-
+        when: "the user becomes an author, the CIs get related and flushed"
         userRepository.saveAndFlush(usr)
         def author = userRepository.findByNameLike('Test%')[0]
 
@@ -125,6 +116,7 @@ class CIRelationshipModelSpec extends Specification {
 
         ciTxt1.language.add(langDE)
         ciTxt2.language.add(langDE)
+
         ci1.author.add(author)
         ci1.mediums.add(ciTxt1)
         ci1.mediums.add(ciTxt2)
@@ -142,24 +134,36 @@ class CIRelationshipModelSpec extends Specification {
         ci1.fieldsOfContact.add(contactField1)
         criticalIncidentRepository.saveAndFlush(ci1)
 
-        then: "something very cool should happen"
-        author.criticalIncidents.all.size() == 2
-        ci0.mediums.all.size() == 1
-        ci0.actors.all.size() == 0
-        ci0.ciOrigin == CriticalIncident.CiOrigin.OwnExperience
-        ci0.typeOfInteraction.one == null
-        ci0.actors.all.size() == 0
-        ci0.countryOfHappening.one == null
-        ci0.hotspots.all.size() == 0
-        ci0.fieldsOfContact.all.size() == 0
+        def testAuthor = userRepository.findByNameLike('Test%')[0]
 
-        ci1.mediums.all.size() == 2
-        ci1.actors.all.size() == 2
-        ci1.ciOrigin == CriticalIncident.CiOrigin.OwnExperience
-        ci1.typeOfInteraction.one == toi
-        ci1.actors.all.size() == 2
-        ci1.countryOfHappening.one == countryDE
-        ci1.hotspots.all.size() == 2
-        ci1.fieldsOfContact.all.size() == 2
+        then: "the testAuthor will have 2 CIs and they got all set relations"
+
+        //CI 1
+        testAuthor.criticalIncidents.all.size() == 2
+        testAuthor.criticalIncidents.all[0].mediums.all.size() == 1
+        testAuthor.criticalIncidents.all[0].actors.all.size() == 0
+        testAuthor.criticalIncidents.all[0].ciOrigin == CriticalIncident.CiOrigin.OwnExperience
+        testAuthor.criticalIncidents.all[0].typeOfInteraction.one == null
+        testAuthor.criticalIncidents.all[0].actors.all.size() == 0
+        testAuthor.criticalIncidents.all[0].countryOfHappening.one == null
+        testAuthor.criticalIncidents.all[0].hotspots.all.size() == 0
+        testAuthor.criticalIncidents.all[0].fieldsOfContact.all.size() == 0
+
+        //CI 2
+        testAuthor.criticalIncidents.all[1].mediums.all.size() == 2
+        testAuthor.criticalIncidents.all[1].mediums.all[0].language.one.label == langDE.label
+        testAuthor.criticalIncidents.all[1].mediums.all[1].language.one == langDE
+        testAuthor.criticalIncidents.all[1].actors.all.size() == 2
+        testAuthor.criticalIncidents.all[1].actors.all[0].origin == actor0.origin
+        testAuthor.criticalIncidents.all[1].actors.all[1].origin == actor1.origin
+        testAuthor.criticalIncidents.all[1].ciOrigin == CriticalIncident.CiOrigin.OwnExperience
+        testAuthor.criticalIncidents.all[1].typeOfInteraction.one == toi
+        testAuthor.criticalIncidents.all[1].countryOfHappening.one == countryDE
+        testAuthor.criticalIncidents.all[1].hotspots.all.size() == 2
+        testAuthor.criticalIncidents.all[1].hotspots.all[0] == hots0
+        testAuthor.criticalIncidents.all[1].hotspots.all[1] == hots1
+        testAuthor.criticalIncidents.all[1].fieldsOfContact.all.size() == 2
+        testAuthor.criticalIncidents.all[1].fieldsOfContact.all[0] == contactField0
+        testAuthor.criticalIncidents.all[1].fieldsOfContact.all[1] == contactField1
     }
 }

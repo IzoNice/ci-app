@@ -42,7 +42,7 @@ import javax.transaction.Transactional
 
 @SpringApplicationConfiguration(classes = CriticalIncidentsApplication)
 @Slf4j
-class CICreateOrUpdateSpec extends Specification {
+class CICrudSpec extends Specification {
 
     @Autowired
     CriticalIncidentService criticalIncidentService

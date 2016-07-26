@@ -80,7 +80,7 @@ class BrowseTab extends SubTree {
 
     private init() {
         uiComponents = vaadin.uiComponents
-        allCis()
+//        allCis()
         tags = uiComponents['browse.tags']
         ciHeader = uiComponents['browse.ciHeader']
         ciHeader.value = "<b>${cis.header[ciCount]}</b>"
@@ -89,7 +89,7 @@ class BrowseTab extends SubTree {
     }
 
     public void allCis() {
-        cis = criticalIncidentService.getAllCriticalIncidents()
+//        cis = criticalIncidentService.getAllCriticalIncidents()
     }
 
     private String tagToString(CriticalIncident criticalIncident) {

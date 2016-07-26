@@ -64,30 +64,30 @@ class CriticalIncidentService {
 
     @Transactional
     public CriticalIncidentDto getCriticalIncidentDto(Long id) {
-        CriticalIncident criticalIncident = criticalIncidentRepository.getOne(id)
-        CriticalIncidentDto criticalIncidentDto = new CriticalIncidentDto()
-        if (criticalIncident) {
-            criticalIncidentDto.id = criticalIncident.id
-            criticalIncidentDto.shortName = criticalIncident.shortName
-            criticalIncidentDto.header = criticalIncident.header
-            criticalIncidentDto.verbal = criticalIncident.verbal
-            criticalIncidentDto.nonVerbal = criticalIncident.nonVerbal
-            criticalIncidentDto.paraverbal = criticalIncident.paraverbal
-            criticalIncidentDto.proxematic = criticalIncident.proxematic
-            criticalIncidentDto.authorId = criticalIncident.author.one.id
-            if (criticalIncident.typeOfInteraction.one)
-                criticalIncidentDto.typeOfInteractionId = criticalIncident.typeOfInteraction.one.id
-            criticalIncident.fieldsOfContact.all.each { fieldofContact ->
-                criticalIncidentDto.fieldOfContactIds.add(fieldofContact.id)
+        CriticalIncident cI = criticalIncidentRepository.getOne(id)
+        CriticalIncidentDto cIDto = new CriticalIncidentDto()
+        if (cI) {
+            cIDto.id = cI.id
+            cIDto.shortName = cI.shortName
+            cIDto.header = cI.header
+            cIDto.verbal = cI.verbal
+            cIDto.nonVerbal = cI.nonVerbal
+            cIDto.paraverbal = cI.paraverbal
+            cIDto.proxematic = cI.proxematic
+            cIDto.authorId = cI.author.one.id
+            if (cI.typeOfInteraction.one)
+                cIDto.typeOfInteractionId = cI.typeOfInteraction.one.id
+            cI.fieldsOfContact.all.each { fieldofContact ->
+                cIDto.fieldOfContactIds.add(fieldofContact.id)
             }
-            criticalIncidentDto.ciOrigin = criticalIncident.ciOrigin
-            if (criticalIncident.countryOfHappening.one)
-                criticalIncidentDto.countryOfHappeningId = criticalIncident.countryOfHappening.one.id
-            criticalIncident.hotspots.all.each { hotspot ->
-                criticalIncidentDto.hotspotIds.add(hotspot.id)
+            cIDto.ciOrigin = cI.ciOrigin
+            if (cI.countryOfHappening.one)
+                cIDto.countryOfHappeningId = cI.countryOfHappening.one.id
+            cI.hotspots.all.each { hotspot ->
+                cIDto.hotspotIds.add(hotspot.id)
             }
-//            criticalIncidentDto.hotspotIds = criticalIncident.hotspot.one.id
-            criticalIncident.mediums.all.each { Medium medium ->
+//            cIDto.hotspotIds = cI.hotspot.one.id
+            cI.mediums.all.each { Medium medium ->
                 MediumDto mediumDto
                 if (medium instanceof Text) {
                     mediumDto = new TextDto()
@@ -102,58 +102,58 @@ class CriticalIncidentService {
                 }
                 mediumDto.id = medium.id
                 mediumDto.languageId = medium.language.one.id
-                criticalIncidentDto.mediums << mediumDto
+                cIDto.mediums << mediumDto
             }
-            criticalIncident.actors.all.each { Actor actor ->
+            cI.actors.all.each { Actor actor ->
                 ActorDto actorDto = new ActorDto()
                 actorDto.id = actor.id
                 actorDto.actorTypeId = actor.type.one.id
                 actorDto.originId = actor.origin.one.id
-                criticalIncidentDto.actors << actorDto
+                cIDto.actors << actorDto
             }
         }
-        criticalIncidentDto
+        cIDto
     }
 
     @Transactional
-    public CriticalIncidentDto createOrUpdate(CriticalIncidentDto criticalIncidentDto) {
-        CriticalIncident criticalIncident
-        if (criticalIncidentDto.id) {
-            criticalIncident = criticalIncidentRepository.getOne(criticalIncidentDto.id)
-            if (!criticalIncident) {
+    public CriticalIncidentDto createOrUpdate(CriticalIncidentDto cIDto) {
+        CriticalIncident cI
+        if (cIDto.id) {
+            cI = criticalIncidentRepository.getOne(cIDto.id)
+            if (!cI) {
                 return new CriticalIncidentDto()
             }
         } else {
-            criticalIncident = new CriticalIncident()
+            cI = new CriticalIncident()
         }
-        criticalIncident.shortName = criticalIncidentDto.shortName
-        criticalIncident.header = criticalIncidentDto.header
-        criticalIncident.ciOrigin = criticalIncidentDto.ciOrigin
-        criticalIncident.verbal = criticalIncidentDto.verbal
-        criticalIncident.nonVerbal = criticalIncidentDto.nonVerbal
-        criticalIncident.paraverbal = criticalIncidentDto.paraverbal
-        criticalIncident.proxematic = criticalIncidentDto.proxematic
-        if (criticalIncidentDto.authorId) {
-            criticalIncident.author = userRepository.getOne(criticalIncidentDto.authorId)
+        cI.shortName = cIDto.shortName
+        cI.header = cIDto.header
+        cI.ciOrigin = cIDto.ciOrigin
+        cI.verbal = cIDto.verbal
+        cI.nonVerbal = cIDto.nonVerbal
+        cI.paraverbal = cIDto.paraverbal
+        cI.proxematic = cIDto.proxematic
+        if (cIDto.authorId) {
+            cI.author = userRepository.getOne(cIDto.authorId)
         }
-        if (criticalIncidentDto.typeOfInteractionId) {
-            criticalIncident.typeOfInteraction = typeOfInteractionRepository.
-                    getOne(criticalIncidentDto.typeOfInteractionId)
+        if (cIDto.typeOfInteractionId) {
+            cI.typeOfInteraction = typeOfInteractionRepository.
+                    getOne(cIDto.typeOfInteractionId)
         }
         // A CI needs a medium to be a CI
-        if (criticalIncidentDto.mediums) {
+        if (cIDto.mediums) {
             // remove mediums from db that are no longer in dto
-            if (criticalIncidentDto.id && criticalIncident.id) {
-                def idsInDb = criticalIncident.mediums.all.id
-                def idsInDto = criticalIncidentDto.mediums.id
+            if (cIDto.id && cI.id) {
+                def idsInDb = cI.mediums.all.id
+                def idsInDto = cIDto.mediums.id
                 def idsToDelete = idsInDb - idsInDto
                 def objectsToDelete = mediumRepository.findAll(idsToDelete)
                 objectsToDelete.each { medium ->
-                    criticalIncident.mediums.remove(medium)
+                    cI.mediums.remove(medium)
                     mediumRepository.delete(medium)
                 }
             }
-            criticalIncidentDto.mediums.each { mediumDto ->
+            cIDto.mediums.each { mediumDto ->
                 Medium medium = null
                 if (mediumDto.id)
                     medium = mediumRepository.getOne(mediumDto.id)
@@ -165,7 +165,7 @@ class CriticalIncidentService {
                     }
                     medium = mediumRepository.saveAndFlush(medium)
                     mediumDto.id = medium.id
-                    criticalIncident.mediums.add(medium)
+                    cI.mediums.add(medium)
                 }
                 if (medium instanceof Text && mediumDto instanceof TextDto) {
                     medium.story = mediumDto.story
@@ -174,19 +174,19 @@ class CriticalIncidentService {
                 if (mediumDto.languageId)
                     medium.language.add(languageRepository.findOne(mediumDto.languageId))
             }
-            if (criticalIncidentDto.actors) {
+            if (cIDto.actors) {
                 // remove actors from db that are no longer in dto
-                if (criticalIncidentDto.id && criticalIncident.id) {
-                    def idsInDb = criticalIncident.actors.all.id
-                    def idsInDto = criticalIncidentDto.actors.id
+                if (cIDto.id && cI.id) {
+                    def idsInDb = cI.actors.all.id
+                    def idsInDto = cIDto.actors.id
                     def idsToDelete = idsInDb - idsInDto
                     def objectsToDelete = actorRepository.findAll(idsToDelete)
                     objectsToDelete.each { actor ->
-                        criticalIncident.actors.remove(actor)
+                        cI.actors.remove(actor)
                     }
                     actorRepository.deleteInBatch(objectsToDelete)
                 }
-                criticalIncidentDto.actors.each { actorDto ->
+                cIDto.actors.each { actorDto ->
                     Actor actor = null
                     // update existing actors
                     if (actorDto.id) {
@@ -204,37 +204,38 @@ class CriticalIncidentService {
                         actorRepository.saveAndFlush(actor)
                         actor.type.add(actorTypeRepository.getOne(actorDto.actorTypeId))
                         actor.origin.add(originRepository.getOne(actorDto.originId))
-                        criticalIncident.actors.add(actor)
+                        cI.actors.add(actor)
                     }
                 }
             }
-            if (criticalIncidentDto.countryOfHappeningId) {
-                criticalIncident.countryOfHappening = countryRepository.
-                        getOne(criticalIncidentDto.countryOfHappeningId)
+            if (cIDto.countryOfHappeningId) {
+                cI.countryOfHappening = countryRepository.
+                        getOne(cIDto.countryOfHappeningId)
             }
-            if (criticalIncidentDto.fieldOfContactIds) {
-                criticalIncident.fieldsOfContact.removeAll()
-                criticalIncidentDto.fieldOfContactIds.each { fieldOfContactId ->
-                    criticalIncident.fieldsOfContact.
+            if (cIDto.fieldOfContactIds) {
+                cI.fieldsOfContact.removeAll()
+                cIDto.fieldOfContactIds.each { fieldOfContactId ->
+                    cI.fieldsOfContact.
                             add(fieldOfContactRepository.getOne(fieldOfContactId))
                 }
             }
-            if (criticalIncidentDto.hotspotIds) {
-                criticalIncident.hotspots.removeAll()
-                criticalIncidentDto.hotspotIds.each { hotspotId ->
-                    criticalIncident.hotspots.add(hotspotRepository.getOne(hotspotId))
+            if (cIDto.hotspotIds) {
+                cI.hotspots.removeAll()
+                cIDto.hotspotIds.each { hotspotId ->
+                    cI.hotspots.add(hotspotRepository.getOne(hotspotId))
                 }
             }
 
-            criticalIncident = criticalIncidentRepository.saveAndFlush(criticalIncident)
-            criticalIncidentDto.id = criticalIncident.id
-            criticalIncidentDto.actors.clear()
-            criticalIncident.actors.all.each { actor ->
-                criticalIncidentDto.actors.add(
+            cI = criticalIncidentRepository.saveAndFlush(cI)
+            cIDto.id = cI.id
+            cIDto.actors.clear()
+            cI.actors.all.each { actor ->
+                cIDto.actors.add(
                         new ActorDto(id: actor.id, actorTypeId: actor.type.one.id,
                                 originId: actor.origin.one.id))
             }
         }
-        criticalIncidentDto
+        log.info("cIDto.id = ${cIDto.id}")
+        cIDto
     }
 }
