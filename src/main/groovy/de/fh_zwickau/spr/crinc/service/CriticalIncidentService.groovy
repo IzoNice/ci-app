@@ -63,54 +63,82 @@ class CriticalIncidentService {
 
 
     @Transactional
+    public List<CriticalIncidentDto> getAllCriticalIncidentDtos(){
+        def cIs = criticalIncidentRepository.findAll()
+        CriticalIncidentDto cIDto = new CriticalIncidentDto()
+        List<CriticalIncidentDto> cIDtos = []
+        cIs.each {cI ->
+            cIDto = createCiDto(cI)
+            cIDtos << cIDto
+        }
+        cIDtos
+    }
+
+    private CriticalIncidentDto createCiDto(CriticalIncident cI) {
+        CriticalIncidentDto cIDto = new CriticalIncidentDto()
+        cIDto.id = cI.id
+        cIDto.shortName = cI.shortName
+        cIDto.header = cI.header
+        cIDto.verbal = cI.verbal
+        cIDto.nonVerbal = cI.nonVerbal
+        cIDto.paraverbal = cI.paraverbal
+        cIDto.proxematic = cI.proxematic
+
+        if (cI.author) {
+            cIDto.authorId = cI.author.one.id
+        }
+        if (cI.typeOfInteraction.one){
+            cIDto.typeOfInteractionId = cI.typeOfInteraction.one.id
+        }
+        if (cI.fieldsOfContact.all){
+            cI.fieldsOfContact.all.each { fieldofContact ->
+                cIDto.fieldOfContactIds.add(fieldofContact.id)
+            }
+        }
+        cIDto.ciOrigin = cI.ciOrigin
+        if (cI.countryOfHappening.one){
+            cIDto.countryOfHappeningId = cI.countryOfHappening.one.id
+        }
+        if (cI.hotspots.all){
+            cI.hotspots.all.each { hotspot ->
+                cIDto.hotspotIds.add(hotspot.id)
+            }
+        }
+        cI.mediums.all.each { Medium medium ->
+            MediumDto mediumDto
+            if (medium instanceof Text) {
+                mediumDto = new TextDto()
+                mediumDto.story = medium.story
+                mediumDto.storyType = medium.storyType
+            } else if (medium instanceof MultiMedia) {
+                mediumDto = new MultiMediaDto()
+                mediumDto.fileName = medium.fileName
+                mediumDto.type = medium.type
+            } else {
+                mediumDto = new MediumDto()
+            }
+            mediumDto.id = medium.id
+            if (medium.language.one){
+                mediumDto.languageId = medium.language.one.id
+            }
+            cIDto.mediums << mediumDto
+        }
+        cI.actors.all.each { Actor actor ->
+            ActorDto actorDto = new ActorDto()
+            actorDto.id = actor.id
+            actorDto.actorTypeId = actor.type.one.id
+            actorDto.originId = actor.origin.one.id
+            cIDto.actors << actorDto
+        }
+        cIDto
+    }
+
+    @Transactional
     public CriticalIncidentDto getCriticalIncidentDto(Long id) {
         CriticalIncident cI = criticalIncidentRepository.getOne(id)
         CriticalIncidentDto cIDto = new CriticalIncidentDto()
         if (cI) {
-            cIDto.id = cI.id
-            cIDto.shortName = cI.shortName
-            cIDto.header = cI.header
-            cIDto.verbal = cI.verbal
-            cIDto.nonVerbal = cI.nonVerbal
-            cIDto.paraverbal = cI.paraverbal
-            cIDto.proxematic = cI.proxematic
-            cIDto.authorId = cI.author.one.id
-            if (cI.typeOfInteraction.one)
-                cIDto.typeOfInteractionId = cI.typeOfInteraction.one.id
-            cI.fieldsOfContact.all.each { fieldofContact ->
-                cIDto.fieldOfContactIds.add(fieldofContact.id)
-            }
-            cIDto.ciOrigin = cI.ciOrigin
-            if (cI.countryOfHappening.one)
-                cIDto.countryOfHappeningId = cI.countryOfHappening.one.id
-            cI.hotspots.all.each { hotspot ->
-                cIDto.hotspotIds.add(hotspot.id)
-            }
-//            cIDto.hotspotIds = cI.hotspot.one.id
-            cI.mediums.all.each { Medium medium ->
-                MediumDto mediumDto
-                if (medium instanceof Text) {
-                    mediumDto = new TextDto()
-                    mediumDto.story = medium.story
-                    mediumDto.storyType = medium.storyType
-                } else if (medium instanceof MultiMedia) {
-                    mediumDto = new MultiMediaDto()
-                    mediumDto.fileName = medium.fileName
-                    mediumDto.type = medium.type
-                } else {
-                    mediumDto = new MediumDto()
-                }
-                mediumDto.id = medium.id
-                mediumDto.languageId = medium.language.one.id
-                cIDto.mediums << mediumDto
-            }
-            cI.actors.all.each { Actor actor ->
-                ActorDto actorDto = new ActorDto()
-                actorDto.id = actor.id
-                actorDto.actorTypeId = actor.type.one.id
-                actorDto.originId = actor.origin.one.id
-                cIDto.actors << actorDto
-            }
+            cIDto = createCiDto(cI)
         }
         cIDto
     }
@@ -118,37 +146,58 @@ class CriticalIncidentService {
     @Transactional
     public CriticalIncidentDto createOrUpdate(CriticalIncidentDto cIDto) {
         CriticalIncident cI
-        if (cIDto.id) {
-            cI = criticalIncidentRepository.getOne(cIDto.id)
-            if (!cI) {
-                return new CriticalIncidentDto()
-            }
-        } else {
-            cI = new CriticalIncident()
-        }
-        cI.shortName = cIDto.shortName
-        cI.header = cIDto.header
-        cI.ciOrigin = cIDto.ciOrigin
-        cI.verbal = cIDto.verbal
-        cI.nonVerbal = cIDto.nonVerbal
-        cI.paraverbal = cIDto.paraverbal
-        cI.proxematic = cIDto.proxematic
-        if (cIDto.authorId) {
-            cI.author = userRepository.getOne(cIDto.authorId)
-        }
-        if (cIDto.typeOfInteractionId) {
-            cI.typeOfInteraction = typeOfInteractionRepository.
-                    getOne(cIDto.typeOfInteractionId)
-        }
+
         // A CI needs a medium to be a CI
         if (cIDto.mediums) {
+            if (cIDto.id) {
+                cI = criticalIncidentRepository.getOne(cIDto.id)
+                if (!cI) {
+                    return new CriticalIncidentDto()
+                }
+            } else {
+                cI = new CriticalIncident()
+            }
+            cI.shortName = cIDto.shortName
+            cI.header = cIDto.header
+            cI.ciOrigin = cIDto.ciOrigin
+            cI.verbal = cIDto.verbal
+            cI.nonVerbal = cIDto.nonVerbal
+            cI.paraverbal = cIDto.paraverbal
+            cI.proxematic = cIDto.proxematic
+
+            if (cIDto.authorId) {
+                cI.author = userRepository.getOne(cIDto.authorId)
+            }
+            if (cIDto.typeOfInteractionId) {
+                cI.typeOfInteraction = typeOfInteractionRepository.
+                        getOne(cIDto.typeOfInteractionId)
+            }
+            if (cIDto.countryOfHappeningId) {
+                cI.countryOfHappening = countryRepository.
+                        getOne(cIDto.countryOfHappeningId)
+            }
+
+            if (cIDto.fieldOfContactIds) {
+                cI.fieldsOfContact.removeAll()
+                cIDto.fieldOfContactIds.each { fieldOfContactId ->
+                    cI.fieldsOfContact.
+                            add(fieldOfContactRepository.getOne(fieldOfContactId))
+                }
+            }
+            if (cIDto.hotspotIds) {
+                cI.hotspots.removeAll()
+                cIDto.hotspotIds.each { hotspotId ->
+                    cI.hotspots.add(hotspotRepository.getOne(hotspotId))
+                }
+            }
+
             // remove mediums from db that are no longer in dto
             if (cIDto.id && cI.id) {
                 def idsInDb = cI.mediums.all.id
                 def idsInDto = cIDto.mediums.id
                 def idsToDelete = idsInDb - idsInDto
-                def objectsToDelete = mediumRepository.findAll(idsToDelete)
-                objectsToDelete.each { medium ->
+                def mediumsToDelete = mediumRepository.findAll(idsToDelete)
+                mediumsToDelete.each { medium ->
                     cI.mediums.remove(medium)
                     mediumRepository.delete(medium)
                 }
@@ -208,23 +257,7 @@ class CriticalIncidentService {
                     }
                 }
             }
-            if (cIDto.countryOfHappeningId) {
-                cI.countryOfHappening = countryRepository.
-                        getOne(cIDto.countryOfHappeningId)
-            }
-            if (cIDto.fieldOfContactIds) {
-                cI.fieldsOfContact.removeAll()
-                cIDto.fieldOfContactIds.each { fieldOfContactId ->
-                    cI.fieldsOfContact.
-                            add(fieldOfContactRepository.getOne(fieldOfContactId))
-                }
-            }
-            if (cIDto.hotspotIds) {
-                cI.hotspots.removeAll()
-                cIDto.hotspotIds.each { hotspotId ->
-                    cI.hotspots.add(hotspotRepository.getOne(hotspotId))
-                }
-            }
+
 
             cI = criticalIncidentRepository.saveAndFlush(cI)
             cIDto.id = cI.id

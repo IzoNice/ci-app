@@ -48,10 +48,9 @@ class BrowseTab extends SubTree {
 
     private Label ciStory, ciHeader
     private Label tags
-
-    List<CriticalIncident> cis = []
+    CriticalIncidentDto cIDto = new CriticalIncidentDto()
+    List<CriticalIncidentDto> cIDtos = []
     private int ciCount = 0
-    CriticalIncidentDto criticalIncidentDto = new CriticalIncidentDto()
 
     @Override
     Component build() {
@@ -61,10 +60,10 @@ class BrowseTab extends SubTree {
                 "$C.hlayout"([spacing: false, margin: false]) {
                     "$F.button"('<',
                             [uikey        : 'backButton',
-                             clickListener: { backButtonClick(it) }])
+                             clickListener: { lastCiButtonClick(it) }])
                     "$F.button"('>',
                             [uikey        : 'nextButton',
-                             clickListener: { nextButtonClick(it) }])
+                             clickListener: { nextCiButtonClick(it) }])
                 }
                 "$F.label"([uikey      : 'ciHeader', width: '40em',
                             contentMode: ContentMode.HTML])
@@ -80,75 +79,112 @@ class BrowseTab extends SubTree {
 
     private init() {
         uiComponents = vaadin.uiComponents
-//        allCis()
+        allCis()
         tags = uiComponents['browse.tags']
         ciHeader = uiComponents['browse.ciHeader']
-        ciHeader.value = "<b>${cis.header[ciCount]}</b>"
+        ciHeader.value = "<b>${cIDtos.header[ciCount]}</b>"
         ciStory = uiComponents['browse.ciStory']
-
+        ciStory.value = "<b>${cIDtos[ciCount].mediums[0].story}</b>"
     }
 
     public void allCis() {
-//        cis = criticalIncidentService.getAllCriticalIncidents()
+        cIDtos = criticalIncidentService.getAllCriticalIncidentDtos()
     }
 
-    private String tagToString(CriticalIncident criticalIncident) {
+    private String dtoString(CriticalIncidentDto cIDto) {
+        String dtoStr = ''
+        dtoStr += "<b>Origin:</b> ${cIDto.ciOrigin}<br> "
+        dtoStr += "<b>verbal:</b> ${cIDto.verbal}<br> "
+        dtoStr += "<b>nonVerbal:</b> ${cIDto.nonVerbal}<br> "
+        dtoStr += "<b>paraverbal:</b> ${cIDto.paraverbal}<br> "
+        dtoStr += "<b>proxematisch:</b> ${cIDto.proxematic}<br> "
+        dtoStr += "<b>Autor:</b> ${cIDto.authorId}<br> "
+        dtoStr += "<b>Land des Geschehens:</b> ${cIDto.countryOfHappeningId} <br>"
+        dtoStr += "<b>Kontaktfelder:</b> ${cIDto.fieldOfContactIds}<br> "
+        dtoStr += "<b>Interaktionstyp:</b> ${cIDto.typeOfInteractionId}<br> "
+        dtoStr += "<b>Hotspots:</b> ${cIDto.hotspotIds}<br> "
+        dtoStr += "<b>mediums:</b> ${cIDto.mediums}<br> "
+        dtoStr += "<b>actors:</b> ${cIDto.actors} <br>"
+        String mediums = ''
+
+        dtoStr
+    }
+
+    private String tagToString(CriticalIncident cI) {
         String tagString = ''
-        if (criticalIncident.mediums.all) {
+        if (cI.mediums.all) {
             String mediums = ''
-            criticalIncident.mediums.all.each { medium ->
+            cI.mediums.all.each { medium ->
                 mediums += "${medium}, "
             }
             tagString += "<b>Text Typ:</b> ${mediums}, "
         }
 
-        if (criticalIncident.typeOfInteraction.one)
-            tagString += "<b>Interaktionsart:</b> ${criticalIncident.typeOfInteraction.one.label} "
-        if (criticalIncident.countryOfHappening)
-            tagString += "<b>Land:</b> ${criticalIncident.countryOfHappening.name}, "
-        if (criticalIncident.actors.all) {
+        if (cI.typeOfInteraction.one)
+            tagString += "<b>Interaktionsart:</b> ${cI.typeOfInteraction.one.label} "
+        if (cI.countryOfHappening)
+            tagString += "<b>Land:</b> ${cI.countryOfHappening.name}, "
+        if (cI.actors.all) {
             String actors = ''
-            criticalIncident.actors.all.each { actor ->
+            cI.actors.all.each { actor ->
                 actors += "${actor.type.one.label} Herkunft: ${actor.origin.one.label}, "
             }
             tagString += "<b>Akteure:</b> ${actors} "
         }
-        if (criticalIncident.verbal || criticalIncident.nonVerbal || criticalIncident.paraverbal
-                || criticalIncident.proxematic) {
+        if (cI.verbal || cI.nonVerbal || cI.paraverbal
+                || cI.proxematic) {
             String levelOfCommunicationsString = ''
-            if (criticalIncident.verbal)
+            if (cI.verbal)
                 levelOfCommunicationsString += "verbal, "
-            if (criticalIncident.nonVerbal)
+            if (cI.nonVerbal)
                 levelOfCommunicationsString += "non-verbal, "
-            if (criticalIncident.paraverbal)
+            if (cI.paraverbal)
                 levelOfCommunicationsString += "paraverbal, "
-            if (criticalIncident.proxematic)
+            if (cI.proxematic)
                 levelOfCommunicationsString += "proxematisch, "
             tagString += "<b>Kommunikationsebene:</b> ${levelOfCommunicationsString}"
         }
-        if (criticalIncident.fieldsOfContact.all) {
+        if (cI.fieldsOfContact.all) {
             String fieldsOfContact = ''
-            criticalIncident.fieldsOfContact.all.each { fieldOfContact ->
+            cI.fieldsOfContact.all.each { fieldOfContact ->
                 fieldsOfContact += "${fieldOfContact.label}, "
             }
             tagString += "<b>Kontaktfeld:</b> ${fieldsOfContact} "
         }
-        if (criticalIncident.hotspot.one?.label) {
-            tagString += "<b>Hotspot:</b> ${criticalIncident.hotspot.one?.label}"
+        if (cI.hotspot.one?.label) {
+            tagString += "<b>Hotspot:</b> ${cI.hotspot.one?.label}"
         }
 
         tagString
     }
 
-    private nextButtonClick(def it) {
-        if (ciCount == cis.size() - 1)
+    private nextCiButtonClick(def it) {
+        if (ciCount == cIDtos.size() - 1)
             ciCount = -1
-        ciHeader.value = "<b>${cis.header[++ciCount]}</b>"
+        updater(++ciCount)
     }
 
-    private backButtonClick(def it) {
-        if (ciCount.abs() == cis.size())
+    private lastCiButtonClick(def it) {
+        if (ciCount.abs() == cIDtos.size())
             ciCount = 0
-        ciHeader.value = "<b>${cis.header[--ciCount]}</b>"
+        updater(--ciCount)
+    }
+
+//    private nextMediumButtonClick(def it) {
+//        if (mediumCount == cIDtos.size() - 1)
+//            mediumCount = -1
+//        updater(++mediumCount)
+//    }
+//
+//    private lastMediumButtonClick(def it) {
+//        if (mediumCount.abs() == cIDtos[ciCount].mediums.size())
+//            mediumCount = 0
+////        updater(--mediumCount)
+//    }
+
+    private updater(int counter){
+        ciHeader.value = "<b>${cIDtos.header[counter]}</b>"
+        ciStory.value = "<b>${cIDtos[counter].mediums[0].story}</b>"
+        tags.value = "<b>tags: ${dtoString(cIDtos[counter])}</b>"
     }
 }

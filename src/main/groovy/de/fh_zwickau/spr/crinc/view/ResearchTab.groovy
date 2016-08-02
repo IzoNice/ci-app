@@ -49,21 +49,26 @@ class ResearchTab extends SubTree {
 
     private OptionGroup storyType
     private ComboBox languageOfNarration
-    private ComboBox typeOfInteraction, medialMediated, written
+    private ComboBox typeOfInteraction
+//    private ComboBox medialMediated, written //invisible not used
     private ComboBox countryOfHappening
     private ComboBox actorsOrigin, actorType
     private Button addActor
     private Table actors
-    private CheckBox verbal, nonVerbal, paraverbal, proxematic
+
     private ComboBox fieldOfContact
     private Button addFieldOfContact
     private Table fieldsOfContact
+
     private ComboBox hotspot
+    private Button addHotspot
+    private Table hotspots
+
+    private CheckBox verbal, nonVerbal, paraverbal, proxematic
 
     private Label storyTypeLbl, languageOfNarrationLbl, typeOfInteractionLbl,
                   countryOfHappeningLbl, actorsLbl,
                   levelOfCommunicationLbl, fieldOfContactLbl, hotspotLbl
-
 
     private ReferenceDataDto referenceDataDto
 
@@ -93,21 +98,21 @@ class ResearchTab extends SubTree {
             }
 
             "$C.gridlayout"([spacing: false, margin: true,
-                             columns: 1, rows: 4]) {
+                             columns: 1, rows: 2]) {
                 "$F.label"([uikey      : 'typeOfInteractionLbl',
                             contentMode: ContentMode.HTML, gridPosition: [0, 0]
                 ])
                 "$F.combo"([uikey              : 'typeOfInteraction',
 //                         alignment   : Alignment.TOP_RIGHT,
                             gridPosition       : [0, 1], visible: true])
-                "$F.combo"('Medial vermittelt',
-                        [uikey       : 'mediaMediated',
-//                         alignment   : Alignment.TOP_RIGHT,
-                         gridPosition: [0, 2], visible: false])
-                "$F.combo"('schriftlich',
-                        [uikey       : 'written',
-//                         alignment   : Alignment.TOP_RIGHT,
-                         gridPosition: [0, 3], visible: false])
+//                "$F.combo"('Medial vermittelt',
+//                        [uikey       : 'medialMediated',
+////                         alignment   : Alignment.TOP_RIGHT,
+//                         gridPosition: [0, 2], visible: true])
+//                "$F.combo"('schriftlich',
+//                        [uikey       : 'written',
+////                         alignment   : Alignment.TOP_RIGHT,
+//                         gridPosition: [0, 3], visible: true])
             }
 
             "$C.gridlayout"([spacing: false, margin: true,
@@ -141,28 +146,33 @@ class ResearchTab extends SubTree {
             "$C.gridlayout"([spacing: false, margin: true,
                              columns: 2, rows: 3]) {
                 "$F.label"([uikey      : 'fieldOfContactLbl',
-                            contentMode: ContentMode.HTML, gridPosition: [0, 0, 1, 0]
+                            contentMode: ContentMode.HTML, gridPosition: [0, 0]
                 ])
                 "$F.combo"(
                         [uikey  : 'fieldOfContact', gridPosition: [0, 1],
                          visible: true])
                 "$F.button"("add",
                         [uikey  : 'addFieldOfContact', gridPosition: [1, 1],
-                         visible: false, clickListener: { addContactField() }])
+                         clickListener: { addContactField() }])
                 "$F.table"(
                         [uikey     : 'fieldsOfContact', width: '100%',
                          selectable: true, valueChangeListener: { removeContactField(it) },
-                         height    : '200px', gridPosition: [0, 2, 1, 2],
-                         visible: false])
+                         height    : '200px', gridPosition: [0, 2, 1, 2]])
             }
             "$C.gridlayout"([spacing: false, margin: true,
                              columns: 2, rows: 3]) {
                 "$F.label"([uikey      : 'hotspotLbl',
-                            contentMode: ContentMode.HTML, gridPosition: [0, 0]
-                ])
+                            contentMode: ContentMode.HTML, gridPosition: [0, 0]])
                 "$F.combo"(
                         [uikey  : 'hotspot', gridPosition: [0, 1],
                          visible: true])
+                "$F.button"("+",
+                        [uikey: 'addHotspot', gridPosition: [1, 1],
+                         clickListener: {addHotspot() }])
+                "$F.table"(
+                        [uikey: 'hotspots', width: '100%',
+                        selectable: true, valueChangeListener: { removeHotspot(it) },
+                        height: '200px', gridPosition: [0, 2, 1, 2]])
             }
             "$C.gridlayout"([spacing: false,
                              margin : true,
@@ -210,8 +220,8 @@ class ResearchTab extends SubTree {
         typeOfInteraction = uiComponents['capture.research.typeOfInteraction']
         typeOfInteractionLbl = uiComponents['capture.research.typeOfInteractionLbl']
         typeOfInteractionLbl.setValue('<b>Interaktionsart<b/>')
-        medialMediated = uiComponents['capture.research.medialMediated']
-        written = uiComponents['capture.research.written']
+//        medialMediated = uiComponents['capture.research.medialMediated']
+//        written = uiComponents['capture.research.written']
         referenceDataDto.typeOfInteraction.each { k, v ->
             typeOfInteraction.addItem(k)
             def caption = "${v[0]}${v[1] ? ', ' + v[1] : ''}".toString()
@@ -244,8 +254,6 @@ class ResearchTab extends SubTree {
         actors = uiComponents['capture.research.actors']
         actors.addContainerProperty(ACTORS, ActorData.class, null)
 
-
-
         fieldOfContact = uiComponents['capture.research.fieldOfContact']
         fieldOfContactLbl = uiComponents['capture.research.fieldOfContactLbl']
         fieldOfContactLbl.setValue('<b>Welches ist das Kontaktfeld?<b/>')
@@ -258,12 +266,16 @@ class ResearchTab extends SubTree {
         fieldsOfContact.addContainerProperty("Fields", ReferenceData.class, null)
 
         hotspot = uiComponents['capture.research.hotspot']
+        hotspotLbl = uiComponents['capture.research.hotspotLbl']
+        hotspotLbl.setValue('<br><b>Hotspot<b/>')
         referenceDataDto.hotspot.each { k, v ->
             hotspot.addItem(k)
             hotspot.setItemCaption(k, v)
         }
-        hotspotLbl = uiComponents['capture.research.hotspotLbl']
-        hotspotLbl.setValue('<br><b>Hotspot<b/>')
+        addHotspot = uiComponents['capture.research.addHotspot']
+        hotspots = uiComponents['capture.research.hotspots']
+        hotspots.addContainerProperty("Hotspots", ReferenceData.class, null)
+
 
         levelOfCommunicationLbl = uiComponents['capture.research.levelOfCommunicationLbl']
         levelOfCommunicationLbl.setValue('<b>Welche Kommunikationsebene wird benannt?<b/>')
@@ -298,11 +310,35 @@ class ResearchTab extends SubTree {
         fieldsOfContact.removeItem(it.source.getValue())
     }
 
+    private addHotspot() {
+        def hotspotId = hotspot.value
+        def hotspotCaption = hotspot.getItemCaption(hotspotId)
+        ReferenceData hotspotData = new ReferenceData(id: hotspotId, caption: hotspotCaption)
+        hotspots.addItem([hotspotData].toArray(), null)
+    }
+
+    private removeHotspot(it) {
+        hotspots.removeItem(it.source.getValue())
+    }
+
     public populateDto(CriticalIncidentDto criticalIncidentDto) {
         criticalIncidentDto.countryOfHappeningId = countryOfHappening.value
-        criticalIncidentDto.fieldOfContactIds = fieldOfContact.value
+
+        def focIds = fieldsOfContact.itemIds
+        focIds.each { focId ->
+            ReferenceData focData = fieldsOfContact.getItem(focId).getItemProperty("Fields").value
+            criticalIncidentDto.fieldOfContactIds << focData.id
+        }
+
         criticalIncidentDto.typeOfInteractionId = typeOfInteraction.value
-        criticalIncidentDto.hotspotIds = hotspot.value
+
+        def hotspotIds = hotspots.itemIds
+        hotspotIds.each { hotspotId ->
+            ReferenceData hotspotData = hotspots.getItem(hotspotId).getItemProperty("Hotspots").value
+            criticalIncidentDto.hotspotIds << hotspotData.id
+        }
+        criticalIncidentDto.hotspotIds
+
         criticalIncidentDto.verbal = verbal.value
         criticalIncidentDto.nonVerbal = nonVerbal.value
         criticalIncidentDto.paraverbal = paraverbal.value
@@ -312,6 +348,7 @@ class ResearchTab extends SubTree {
         if(mediumDto instanceof TextDto) {
             mediumDto.storyType = storyType.value
         }
+
         def actorIds = actors.itemIds
         actorIds.each { itemId ->
             ActorData actorData = actors.getItem(itemId).getItemProperty(ACTORS).value
@@ -320,10 +357,11 @@ class ResearchTab extends SubTree {
                     originId: actorData.originId)
             criticalIncidentDto.actors << actorDto
         }
+
         resetFields()
     }
 
-    private resetFields(){
+    public resetFields(){
         storyType.value = null
         languageOfNarration.value = null
         typeOfInteraction.value = null
@@ -338,5 +376,6 @@ class ResearchTab extends SubTree {
         fieldOfContact.value = null
         fieldsOfContact.removeAllItems()
         hotspot.value = null
+        hotspots.removeAllItems()
     }
 }

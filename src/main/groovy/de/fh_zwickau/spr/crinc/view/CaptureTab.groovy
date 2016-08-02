@@ -87,7 +87,7 @@ class CaptureTab extends SubTree {
                               margin: false, alignment: Alignment.BOTTOM_LEFT]) {
                     "$F.button"('Speichern', [uikey: 'saveButton', clickListener: { saveButtonClick() }])
                     "$F.button"('Abbrechen',
-                            [uikey: 'escButton', clickListener: { saveButtonClick() }])
+                            [uikey: 'escButton', clickListener: { escButtonClick() }])
                 }
             }
         }
@@ -123,6 +123,7 @@ class CaptureTab extends SubTree {
     private saveButtonClick() {
         CriticalIncidentDto criticalIncidentDto = new CriticalIncidentDto()
         criticalIncidentDto.header = headerField.value
+        criticalIncidentDto.authorId = 1l
         TextDto textDto = new TextDto(story: storyField.value)
         criticalIncidentDto.mediums << textDto
         researchTab.populateDto(criticalIncidentDto)
@@ -132,8 +133,13 @@ class CaptureTab extends SubTree {
         resetFields()
     }
 
+    private escButtonClick() {
+        resetFields()
+    }
+
     private resetFields(){
         headerField.value = ''
         storyField.value = ''
+        researchTab.resetFields()
     }
 }
