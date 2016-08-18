@@ -63,6 +63,18 @@ class CriticalIncidentService {
 
 
     @Transactional
+    public User login(String uName, def password){
+        User user = userRepository.findByName(uName)
+        if (user){
+            if (user.password == password){
+                return user
+            }
+        }else {
+            return new User()
+        }
+    }
+
+    @Transactional
     public List<CriticalIncidentDto> getAllCriticalIncidentDtos(){
         def cIs = criticalIncidentRepository.findAll()
         CriticalIncidentDto cIDto = new CriticalIncidentDto()
@@ -84,6 +96,9 @@ class CriticalIncidentService {
         cIDto.paraverbal = cI.paraverbal
         cIDto.proxematic = cI.proxematic
 
+//        log.info("$cI.author")
+//        log.info("$cI.author.one")
+//        log.info("$cI.author.one.criticalIncidents.one.author.one")
         if (cI.author) {
             cIDto.authorId = cI.author.one.id
         }
@@ -268,7 +283,7 @@ class CriticalIncidentService {
                                 originId: actor.origin.one.id))
             }
         }
-        log.info("cIDto.id = ${cIDto.id}")
+//        log.info("cIDto.id = ${cIDto.id}")
         cIDto
     }
 }

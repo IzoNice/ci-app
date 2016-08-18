@@ -23,15 +23,6 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../libs/vaadin-spring-ext-security-0.0.7-SNAPSHOT.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="jar://$MODULE_DIR$/../../libs/associations-0.1.0.jar!/" />
         </CLASSES>
         <JAVADOC />
@@ -42,6 +33,15 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../../libs/vaadin-spring-ext-core-0.0.7-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../libs/vaadin-spring-ext-security-0.0.7-SNAPSHOT.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

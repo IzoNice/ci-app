@@ -34,60 +34,57 @@ import de.fh_zwickau.spr.crinc.dto.CriticalIncidentDto
 import de.fh_zwickau.spr.crinc.dto.TextDto
 import de.fh_zwickau.spr.crinc.service.CriticalIncidentService
 import de.geobe.util.vaadin.SubTree
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 
 import static de.geobe.util.vaadin.VaadinBuilder.C
 import static de.geobe.util.vaadin.VaadinBuilder.F
 
+@Slf4j
 @SpringComponent
 @UIScope
 class CaptureTab extends SubTree {
     @Autowired
     private CriticalIncidentService criticalIncidentService
     @Autowired
-    private ResearchTab researchTab
+    private CaptureCategoriesView captureCategoriesView
     @Autowired
     private BrowseTab browseTab
+    @Autowired
+    private LoginTab loginTab
+//    @Autowired
+//    private ForumTab forumTab
 
-    private Component researchRoot
-    private boolean researchVisible = false
-    private Label headerFieldLabel, storyFieldLabel
+    private Component categoriesRoot
+    private boolean categoriesVisible = false
+    private Label headerFieldLabel, storyAreaLabel
     private TextField headerField
-    private TextArea storyField
-    private Button saveButton, escButton, researchButton
+    private TextArea storyArea
+    private Button saveButton, updateButton, escButton
+    private CheckBox categoriesBox
+    private HorizontalLayout categoriesLayout
 
+    private long updateDtoId, updateDtoAuthorId
 
     @Override
     Component build() {
-        researchRoot = researchTab.buildSubtree(vaadin, 'research.')
-        def c = vaadin."$C.hlayout"('erfassen', [spacing: true, margin: false,
+        categoriesRoot = captureCategoriesView.buildSubtree(vaadin, 'categories.')
+        def c = vaadin."$C.hlayout"('erfassen', [uikey: 'categoriesLayout', spacing: true, margin: false,
                                                  width  : '45em']) {
             "$C.vlayout"([spacing: true, margin: true]) {
-                "$C.gridlayout"(
-                        [spacing: false, margin: false,
-                         columns: 1, rows: 2]) {
-                    "$F.label"([uikey: 'headerFieldLabel', contentMode: ContentMode.HTML,
-                                gridPosition: [0, 0]])
-                    "$F.text"([uikey: 'headerField', width: '40em',
-                               gridPosition: [0, 1]])
-                }
-                "$C.gridlayout"(
-                        [spacing: false, margin: false,
-                         columns: 1, rows: 2]) {
-                    "$F.label"([uikey: 'storyFieldLabel', contentMode: ContentMode.HTML,
-                                                          gridPosition: [0, 0]])
-                    "$F.textarea"([uikey: 'storyField', width: '40em',
-                                                        gridPosition: [0, 1]])
-                }
-                "$F.button"('for Research',
-                        [uikey        : 'researchButton', alignment: Alignment.MIDDLE_RIGHT,
-                         clickListener: { researchButtonClick() }])
-                "$F.subtree"(researchRoot, [uikey: 'researchArea', visible: false])
+                "$F.label"([uikey: 'headerFieldLabel', contentMode: ContentMode.HTML])
+                "$F.text"([uikey: 'headerField', width: '40em'])
+                "$F.label"([uikey: 'storyAreaLabel', contentMode: ContentMode.HTML])
+                "$F.textarea"([uikey: 'storyArea', width: '40em'])
+                "$F.checkbox"('categories', [uikey              : 'categoriesBox', margin: false, value: false,
+                                             valueChangeListener: { categoriesBoxCheck() }])
+                "$F.subtree"(categoriesRoot, [uikey: 'categoriesArea', visible: false, gridPosition: [0, 0]])
                 "$C.hlayout"([uikey : 'buttonArea', spacing: true,
                               margin: false, alignment: Alignment.BOTTOM_LEFT]) {
                     "$F.button"('Speichern', [uikey: 'saveButton', clickListener: { saveButtonClick() }])
-                    "$F.button"('Abbrechen',
-                            [uikey: 'escButton', clickListener: { escButtonClick() }])
+                    "$F.button"('Bearbeitung Speichern', [uikey: 'updateButton',
+                                                          visible: false, clickListener: { updateButtonClick() }])
+                    "$F.button"('Abbrechen', [uikey: 'escButton', clickListener: { escButtonClick() }])
                 }
             }
         }
@@ -97,39 +94,56 @@ class CaptureTab extends SubTree {
 
     private init() {
         uiComponents = vaadin.uiComponents
+        browseTab.captureTab = this
+        categoriesLayout = uiComponents['capture.categoriesLayout']
         saveButton = uiComponents['capture.saveButton']
+        updateButton = uiComponents['capture.updateButton']
         escButton = uiComponents['capture.escButton']
-        researchButton = uiComponents['capture.researchButton']
+        categoriesBox = uiComponents['capture.categoriesBox']
         headerFieldLabel = uiComponents['capture.headerFieldLabel']
         headerFieldLabel.value = "<b>header</b>"
         headerField = uiComponents['capture.headerField']
-        storyFieldLabel = uiComponents['capture.storyFieldLabel']
-        storyFieldLabel.value = "<b>story</b>"
-        storyField = uiComponents['capture.storyField']
+        storyAreaLabel = uiComponents['capture.storyAreaLabel']
+        storyAreaLabel.value = "<b>story</b>"
+        storyArea = uiComponents['capture.storyArea']
     }
 
-    private researchButtonClick() {
-        if (researchVisible) {
-            researchVisible = false
-            researchRoot.visible = false
-            researchButton.caption = 'for Research'
+    private categoriesBoxCheck() {
+        if (categoriesVisible) {
+            categoriesVisible = false
+            categoriesRoot.visible = false
+//            researchButton.caption = 'for Research'
         } else {
-            researchVisible = true
-            researchRoot.visible = true
-            researchButton.caption = 'hide Research'
+            categoriesVisible = true
+            categoriesRoot.visible = true
+//            researchButton.caption = 'hide Research'
         }
     }
 
     private saveButtonClick() {
-        CriticalIncidentDto criticalIncidentDto = new CriticalIncidentDto()
-        criticalIncidentDto.header = headerField.value
-        criticalIncidentDto.authorId = 1l
-        TextDto textDto = new TextDto(story: storyField.value)
-        criticalIncidentDto.mediums << textDto
-        researchTab.populateDto(criticalIncidentDto)
-        criticalIncidentService.createOrUpdate(criticalIncidentDto)
+        CriticalIncidentDto ciDto = new CriticalIncidentDto()
+        ciDto.header = headerField.value
+        ciDto.authorId = loginTab.loggedIn.id
+        TextDto textDto = new TextDto(story: storyArea.value)
+        ciDto.mediums << textDto
+        captureCategoriesView.populateDto(ciDto)
+        criticalIncidentService.createOrUpdate(ciDto)
 
         browseTab.allCis()
+        resetFields()
+    }
+
+    private updateButtonClick() {
+        CriticalIncidentDto ciDto = new CriticalIncidentDto()
+        ciDto.authorId = updateDtoAuthorId
+        ciDto.id = updateDtoId
+        ciDto.header = headerField.value
+        TextDto textDto = new TextDto(story: storyArea.value)
+        ciDto.mediums << textDto
+        captureCategoriesView.populateDto(ciDto)
+        criticalIncidentService.createOrUpdate(ciDto)
+        saveButton.visible = true
+        updateButton.visible = false
         resetFields()
     }
 
@@ -137,9 +151,20 @@ class CaptureTab extends SubTree {
         resetFields()
     }
 
-    private resetFields(){
+    private resetFields() {
         headerField.value = ''
-        storyField.value = ''
-        researchTab.resetFields()
+        storyArea.value = ''
+        captureCategoriesView.resetFields()
+    }
+
+    public updateCi(CriticalIncidentDto cIDto){
+        resetFields()
+        updateDtoId = cIDto.id
+        updateDtoAuthorId = cIDto.authorId
+        headerField.value = cIDto.header
+        storyArea.value = cIDto.mediums[0].story
+        captureCategoriesView.updateCiCategories(cIDto)
+        saveButton.visible = false
+        updateButton.visible = true
     }
 }

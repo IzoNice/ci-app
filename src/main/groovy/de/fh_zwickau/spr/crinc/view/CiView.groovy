@@ -27,6 +27,7 @@
 package de.fh_zwickau.spr.crinc.view
 
 import com.vaadin.annotations.Theme
+import com.vaadin.annotations.Title
 import com.vaadin.server.VaadinRequest
 import com.vaadin.spring.annotation.SpringUI
 import com.vaadin.ui.Component
@@ -38,18 +39,21 @@ import static VaadinBuilder.C
 import static VaadinBuilder.F
 
 @SpringUI(path = '/')
-
+@Title('CI-APP')
 @Theme('valo')
 class CiView extends UI {
 
     @Autowired
     private BrowseTab browseTab
     @Autowired
-    CaptureTab captureTab
+    private CaptureTab captureTab
+    @Autowired
+    private ForumTab forumTab
+    @Autowired
+    private LoginTab loginTab
 
     private VaadinBuilder vaadin
-    private widgets = [:]
-    private Component root, browseRoot, captureRoot
+    private Component root, browseRoot, captureRoot, forumRoot, login
 
     @Override
     protected void init(VaadinRequest request) {
@@ -59,12 +63,16 @@ class CiView extends UI {
     private Component initBuilder() {
         vaadin = new VaadinBuilder()
 
+        login = loginTab.buildSubtree(vaadin, 'login.')
         browseRoot = browseTab.buildSubtree(vaadin, 'browse.')
         captureRoot = captureTab.buildSubtree(vaadin, 'capture.')
+//        forumRoot = forumTab.buildSubtree(vaadin, 'forum.')
 
         root = vaadin."$C.tabsheet"([uikey: 'toptab', responsive: true]) {
-            "$F.subtree"(browseRoot, [uikey: 'browseTab'])
-            "$F.subtree"(captureRoot, [uikey: 'captureTab'])
+            "$F.subtree"(login, [uikey: 'login'])
+            "$F.subtree"(browseRoot, [uikey: 'browseTab', visible: false])
+            "$F.subtree"(captureRoot, [uikey: 'captureTab', visible: false])
+//            "$F.subtree"(forumRoot, [uikey: 'forumTab'])
         }
 
     }

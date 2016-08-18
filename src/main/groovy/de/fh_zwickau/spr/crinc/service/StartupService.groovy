@@ -145,6 +145,8 @@ class StartupService implements IStartupService {
             userRepository.saveAndFlush(usr1)
             def usr2 = new User([name: 'Christoph', password: 'Ding'])
             userRepository.saveAndFlush(usr2)
+            def usr3 = new User([name: 'a', password: 'a'])
+            userRepository.saveAndFlush(usr3)
 
             def ciAuthor = userRepository.findAll()[0]
             def langDE = languageRepository.findByLabelLike('Deut%')[0]

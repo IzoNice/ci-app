@@ -40,7 +40,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../libs/vaadin-spring-ext-security-0.0.7-SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../libs/vaadin-spring-ext-core-0.0.7-SNAPSHOT.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -49,7 +49,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../libs/vaadin-spring-ext-core-0.0.7-SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../libs/vaadin-spring-ext-security-0.0.7-SNAPSHOT.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

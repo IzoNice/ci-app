@@ -27,10 +27,14 @@ package de.fh_zwickau.spr.crinc.view
 import com.vaadin.shared.ui.label.ContentMode
 import com.vaadin.spring.annotation.SpringComponent
 import com.vaadin.spring.annotation.UIScope
-import com.vaadin.ui.*
-import de.fh_zwickau.spr.crinc.domain.CriticalIncident
+import com.vaadin.ui.Button
+import com.vaadin.ui.Component
+import com.vaadin.ui.Label
+import com.vaadin.ui.themes.Reindeer
 import de.fh_zwickau.spr.crinc.dto.CriticalIncidentDto
+import de.fh_zwickau.spr.crinc.dto.ReferenceDataDto
 import de.fh_zwickau.spr.crinc.service.CriticalIncidentService
+import de.fh_zwickau.spr.crinc.service.ReferenceDataService
 import de.geobe.util.vaadin.SubTree
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -38,25 +42,63 @@ import org.springframework.beans.factory.annotation.Autowired
 import static de.geobe.util.vaadin.VaadinBuilder.C
 import static de.geobe.util.vaadin.VaadinBuilder.F
 
-
 @SpringComponent
 @UIScope
 @Slf4j
 class BrowseTab extends SubTree {
     @Autowired
     private CriticalIncidentService criticalIncidentService
+    @Autowired
+    private ReferenceDataService referenceDataService
 
+    CaptureTab captureTab
+
+    private ReferenceDataDto referenceDataDto
+    public getReferenceDataDto() { referenceDataDto }
+
+    private Component categoriesRoot
     private Label ciStory, ciHeader
     private Label tags
+    private Button updateBtn, leftBtn, rightBtn
     CriticalIncidentDto cIDto = new CriticalIncidentDto()
     List<CriticalIncidentDto> cIDtos = []
     private int ciCount = 0
 
     @Override
     Component build() {
+//        categoriesRoot = categoriesTab.buildSubtree(vaadin, 'categories.')
         def c = vaadin."$C.hlayout"('ansehen', [spacing: true, margin: false,
                                                 width  : '45em']) {
-            "$C.vlayout"([spacing: true, margin: true, width: '40em']) {
+            "$C.vlayout"([spacing: true, margin: true]) {
+                "$C.gridlayout"(
+                        [spacing: false, margin: false, columns: 4, rows: 1, visible: false]) {
+                        "$F.checkbox"('best',
+                                [uikey: 'best', gridPosition: [0, 0], width: '5em',
+                                 valueChangeListener: { bestBoxChanged() }])
+                        "$F.checkbox"('most active',
+                                [uikey: 'mostActive', gridPosition: [1, 0], width: '10em',
+                                 valueChangeListener: { mostActiveBoxChanged() }])
+                        "$F.checkbox"('mine',
+                                [uikey: 'mine', gridPosition: [2, 0], width: '5em',
+                                 valueChangeListener: { mineBoxChanged() }])
+                        "$F.checkbox"('categories',
+                                [uikey: 'categories', gridPosition: [3, 0], width: '5em',
+                                 valueChangeListener: { categoriesBoxChanged() }])
+                }
+                //categories Filter
+//                "$F.subtree"(categoriesRoot, [uikey: 'categoriesArea', visible: false, gridPosition: [0, 0]])
+//                "$F.button"('Filter',
+//                        [uikey: 'filterBtn', gridPosition: [0, 1], visible: false, clickListener: { filterBtnClick() }])
+
+                //ciList
+                "$C.gridlayout"([uikey: 'ciList', visible: false, columns: 2, rows: 2]){
+                    "$F.table"([uikey: 'cis', gridPosition: [0, 0, 1, 0]])
+                    "$F.button"('<',[uikey: 'leftBtn', gridPosition: [0, 1], clickListener: { ciListLeftBtnClick() }])
+                    "$F.button"('>',[uikey: 'rightBtn', gridPosition: [1, 1], clickListener: { ciListRightBtnClick() }])
+                }
+//                //ciUpdate
+//                "$C.gridlayout"([uikey: 'ciUpdate', visible: false])
+               //ciRead
                 "$C.hlayout"([spacing: false, margin: false]) {
                     "$F.button"('<',
                             [uikey        : 'backButton',
@@ -69,6 +111,9 @@ class BrowseTab extends SubTree {
                             contentMode: ContentMode.HTML])
                 "$F.label"([uikey      : 'ciStory', width: '40em',
                             contentMode: ContentMode.HTML])
+                "$F.button"('bearbeiten',
+                            [uikey: 'updateBtn',
+                             clickListener: { updateBtnClick() }])
                 "$F.label"([uikey      : 'tags', width: '40em',
                             contentMode: ContentMode.HTML])
             }
@@ -78,6 +123,7 @@ class BrowseTab extends SubTree {
     }
 
     private init() {
+        referenceDataDto = referenceDataService.getReferenceData()
         uiComponents = vaadin.uiComponents
         allCis()
         tags = uiComponents['browse.tags']
@@ -85,6 +131,14 @@ class BrowseTab extends SubTree {
         ciHeader.value = "<b>${cIDtos.header[ciCount]}</b>"
         ciStory = uiComponents['browse.ciStory']
         ciStory.value = "<b>${cIDtos[ciCount].mediums[0].story}</b>"
+        updateBtn = uiComponents['browse.updateBtn']
+        tags.value = "<b>tags: ${dtoString(cIDtos[ciCount])}</b>"
+        updateBtn.setStyleName(Reindeer.BUTTON_LINK)
+    }
+
+    private updateBtnClick() {
+        cIDto = cIDtos[ciCount]
+        captureTab.updateCi(cIDto)
     }
 
     public void allCis() {
@@ -94,68 +148,29 @@ class BrowseTab extends SubTree {
     private String dtoString(CriticalIncidentDto cIDto) {
         String dtoStr = ''
         dtoStr += "<b>Origin:</b> ${cIDto.ciOrigin}<br> "
-        dtoStr += "<b>verbal:</b> ${cIDto.verbal}<br> "
-        dtoStr += "<b>nonVerbal:</b> ${cIDto.nonVerbal}<br> "
-        dtoStr += "<b>paraverbal:</b> ${cIDto.paraverbal}<br> "
-        dtoStr += "<b>proxematisch:</b> ${cIDto.proxematic}<br> "
+        if (cIDto.verbal)
+            dtoStr += "<b>verbal:</b> ${cIDto.verbal}<br> "
+        if (cIDto.nonVerbal)
+            dtoStr += "<b>nonVerbal:</b> ${cIDto.nonVerbal}<br> "
+        if (cIDto.paraverbal)
+            dtoStr += "<b>paraverbal:</b> ${cIDto.paraverbal}<br> "
+        if (cIDto.proxematic)
+            dtoStr += "<b>proxematisch:</b> ${cIDto.proxematic}<br> "
         dtoStr += "<b>Autor:</b> ${cIDto.authorId}<br> "
         dtoStr += "<b>Land des Geschehens:</b> ${cIDto.countryOfHappeningId} <br>"
         dtoStr += "<b>Kontaktfelder:</b> ${cIDto.fieldOfContactIds}<br> "
         dtoStr += "<b>Interaktionstyp:</b> ${cIDto.typeOfInteractionId}<br> "
         dtoStr += "<b>Hotspots:</b> ${cIDto.hotspotIds}<br> "
-        dtoStr += "<b>mediums:</b> ${cIDto.mediums}<br> "
-        dtoStr += "<b>actors:</b> ${cIDto.actors} <br>"
-        String mediums = ''
+//        dtoStr += "<b>mediums:</b> ${cIDto.mediums}<br> "
+        if (cIDto.actors){
+            dtoStr += "<b>actors:</b> "
+            cIDto.actors.each {actor ->
+                dtoStr += "${actor}<br>"
+            }
+        }
+//        String mediums = ''
 
         dtoStr
-    }
-
-    private String tagToString(CriticalIncident cI) {
-        String tagString = ''
-        if (cI.mediums.all) {
-            String mediums = ''
-            cI.mediums.all.each { medium ->
-                mediums += "${medium}, "
-            }
-            tagString += "<b>Text Typ:</b> ${mediums}, "
-        }
-
-        if (cI.typeOfInteraction.one)
-            tagString += "<b>Interaktionsart:</b> ${cI.typeOfInteraction.one.label} "
-        if (cI.countryOfHappening)
-            tagString += "<b>Land:</b> ${cI.countryOfHappening.name}, "
-        if (cI.actors.all) {
-            String actors = ''
-            cI.actors.all.each { actor ->
-                actors += "${actor.type.one.label} Herkunft: ${actor.origin.one.label}, "
-            }
-            tagString += "<b>Akteure:</b> ${actors} "
-        }
-        if (cI.verbal || cI.nonVerbal || cI.paraverbal
-                || cI.proxematic) {
-            String levelOfCommunicationsString = ''
-            if (cI.verbal)
-                levelOfCommunicationsString += "verbal, "
-            if (cI.nonVerbal)
-                levelOfCommunicationsString += "non-verbal, "
-            if (cI.paraverbal)
-                levelOfCommunicationsString += "paraverbal, "
-            if (cI.proxematic)
-                levelOfCommunicationsString += "proxematisch, "
-            tagString += "<b>Kommunikationsebene:</b> ${levelOfCommunicationsString}"
-        }
-        if (cI.fieldsOfContact.all) {
-            String fieldsOfContact = ''
-            cI.fieldsOfContact.all.each { fieldOfContact ->
-                fieldsOfContact += "${fieldOfContact.label}, "
-            }
-            tagString += "<b>Kontaktfeld:</b> ${fieldsOfContact} "
-        }
-        if (cI.hotspot.one?.label) {
-            tagString += "<b>Hotspot:</b> ${cI.hotspot.one?.label}"
-        }
-
-        tagString
     }
 
     private nextCiButtonClick(def it) {

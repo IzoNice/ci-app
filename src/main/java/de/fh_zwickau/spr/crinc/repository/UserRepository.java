@@ -33,4 +33,5 @@ import java.util.List;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByNameLike(String l);
+    User findByName(String l);
 }

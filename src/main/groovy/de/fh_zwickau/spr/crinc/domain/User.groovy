@@ -48,7 +48,8 @@ class User {
     private ToMany<User, CriticalIncident> toCriticalIncidents = new ToMany<>(
             {this.@criticalIncidents} as IToAny.IGet,
             this,
-            {o -> o.author}
+//            null
+            {ci -> ci.author}
     )
     public IToAny<CriticalIncident> getCriticalIncidents() {toCriticalIncidents}
 

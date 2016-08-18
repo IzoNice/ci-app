@@ -50,6 +50,6 @@ class CIGetAllSpec  extends Specification {
 
         then: "all values should be there"
         cIDtos
-        cIDtos.size() == 2
+        cIDtos.size() == 1
     }
 }

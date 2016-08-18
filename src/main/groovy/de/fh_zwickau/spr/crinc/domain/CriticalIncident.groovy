@@ -67,9 +67,10 @@ class CriticalIncident {
     @Transient
     private ToOne<CriticalIncident, User> toAuthor = new ToOne<>(
             {this.@author} as IToAny.IGet,
-            {o -> this.@author = o},
+            {aut -> this.@author = aut},
             this,
-            {o -> o.criticalIncidents} as IGetOther
+//            null
+            {aut -> aut.criticalIncidents} as IGetOther
     )
     public IToAny<User> getAuthor() {toAuthor}
 
