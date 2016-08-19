@@ -139,7 +139,7 @@ class StartupService implements IStartupService {
                 hotspotRepository.saveAndFlush(hotspot)
             }
 
-            def usr0 = new User([name: 'Doris', password: 'Ding'])
+            def usr0 = new User([name: 'Doris', password: 'C1M8st3r'])
             userRepository.saveAndFlush(usr0)
             def usr1 = new User([name: 'FFK', password: 'Ding'])
             userRepository.saveAndFlush(usr1)

@@ -53,6 +53,7 @@ class LoginTab extends SubTree {
     private PasswordField password
     private Button login
     private VerticalLayout loginLayout, logoutLayout
+    private TabSheet toptab
 
     private Component browseRoot, captureRoot, forumRoot
 
@@ -114,6 +115,7 @@ class LoginTab extends SubTree {
         if (loggedIn.name == uName) {
             Notification.show('Login erfolgreich', "user ${loggedIn.name}",
                     Notification.Type.HUMANIZED_MESSAGE)
+            toptab = uiComponents['toptab']
             browseRoot = uiComponents['browseTab']
             captureRoot = uiComponents['captureTab']
 //            forumRoot = uiComponents['forumTab']
@@ -123,6 +125,7 @@ class LoginTab extends SubTree {
 
             loginLayout.visible = false
             logoutLayout.visible = true
+            toptab.selectedTab = browseRoot
         } else {
             Notification.show('Login Fehler', "user ${loggedIn.name}",
                     Notification.Type.HUMANIZED_MESSAGE)

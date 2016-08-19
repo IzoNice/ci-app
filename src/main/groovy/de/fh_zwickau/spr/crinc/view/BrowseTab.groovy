@@ -30,6 +30,7 @@ import com.vaadin.spring.annotation.UIScope
 import com.vaadin.ui.Button
 import com.vaadin.ui.Component
 import com.vaadin.ui.Label
+import com.vaadin.ui.TabSheet
 import com.vaadin.ui.themes.Reindeer
 import de.fh_zwickau.spr.crinc.dto.CriticalIncidentDto
 import de.fh_zwickau.spr.crinc.dto.ReferenceDataDto
@@ -54,12 +55,14 @@ class BrowseTab extends SubTree {
     CaptureTab captureTab
 
     private ReferenceDataDto referenceDataDto
+
     public getReferenceDataDto() { referenceDataDto }
 
-    private Component categoriesRoot
+    private Component categoriesRoot, browseRoot, captureRoot
     private Label ciStory, ciHeader
     private Label tags
     private Button updateBtn, leftBtn, rightBtn
+    private TabSheet toptab
     CriticalIncidentDto cIDto = new CriticalIncidentDto()
     List<CriticalIncidentDto> cIDtos = []
     private int ciCount = 0
@@ -72,33 +75,39 @@ class BrowseTab extends SubTree {
             "$C.vlayout"([spacing: true, margin: true]) {
                 "$C.gridlayout"(
                         [spacing: false, margin: false, columns: 4, rows: 1, visible: false]) {
-                        "$F.checkbox"('best',
-                                [uikey: 'best', gridPosition: [0, 0], width: '5em',
-                                 valueChangeListener: { bestBoxChanged() }])
-                        "$F.checkbox"('most active',
-                                [uikey: 'mostActive', gridPosition: [1, 0], width: '10em',
-                                 valueChangeListener: { mostActiveBoxChanged() }])
-                        "$F.checkbox"('mine',
-                                [uikey: 'mine', gridPosition: [2, 0], width: '5em',
-                                 valueChangeListener: { mineBoxChanged() }])
-                        "$F.checkbox"('categories',
-                                [uikey: 'categories', gridPosition: [3, 0], width: '5em',
-                                 valueChangeListener: { categoriesBoxChanged() }])
+                    "$F.checkbox"('best',
+                            [uikey              : 'best', gridPosition: [0, 0], width: '5em',
+                             valueChangeListener: { bestBoxChanged() }])
+                    "$F.checkbox"('most active',
+                            [uikey              : 'mostActive', gridPosition: [1, 0], width: '10em',
+                             valueChangeListener: { mostActiveBoxChanged() }])
+                    "$F.checkbox"('mine',
+                            [uikey              : 'mine', gridPosition: [2, 0], width: '5em',
+                             valueChangeListener: { mineBoxChanged() }])
+                    "$F.checkbox"('categories',
+                            [uikey              : 'categories', gridPosition: [3, 0], width: '5em',
+                             valueChangeListener: { categoriesBoxChanged() }])
                 }
                 //categories Filter
-//                "$F.subtree"(categoriesRoot, [uikey: 'categoriesArea', visible: false, gridPosition: [0, 0]])
+//                "$F.subtree"(categoriesRoot, [uikey: 'categoriesArea', visible: false,
+// gridPosition: [0, 0]])
 //                "$F.button"('Filter',
-//                        [uikey: 'filterBtn', gridPosition: [0, 1], visible: false, clickListener: { filterBtnClick() }])
+//                        [uikey: 'filterBtn', gridPosition: [0, 1], visible: false,
+// clickListener: { filterBtnClick() }])
 
                 //ciList
-                "$C.gridlayout"([uikey: 'ciList', visible: false, columns: 2, rows: 2]){
+                "$C.gridlayout"([uikey: 'ciList', visible: false, columns: 2, rows: 2]) {
                     "$F.table"([uikey: 'cis', gridPosition: [0, 0, 1, 0]])
-                    "$F.button"('<',[uikey: 'leftBtn', gridPosition: [0, 1], clickListener: { ciListLeftBtnClick() }])
-                    "$F.button"('>',[uikey: 'rightBtn', gridPosition: [1, 1], clickListener: { ciListRightBtnClick() }])
+                    "$F.button"('<', [uikey: 'leftBtn', gridPosition: [0, 1], clickListener: {
+                        ciListLeftBtnClick()
+                    }])
+                    "$F.button"('>', [uikey: 'rightBtn', gridPosition: [1, 1], clickListener: {
+                        ciListRightBtnClick()
+                    }])
                 }
 //                //ciUpdate
 //                "$C.gridlayout"([uikey: 'ciUpdate', visible: false])
-               //ciRead
+                //ciRead
                 "$C.hlayout"([spacing: false, margin: false]) {
                     "$F.button"('<',
                             [uikey        : 'backButton',
@@ -112,8 +121,8 @@ class BrowseTab extends SubTree {
                 "$F.label"([uikey      : 'ciStory', width: '40em',
                             contentMode: ContentMode.HTML])
                 "$F.button"('bearbeiten',
-                            [uikey: 'updateBtn',
-                             clickListener: { updateBtnClick() }])
+                        [uikey        : 'updateBtn',
+                         clickListener: { updateBtnClick() }])
                 "$F.label"([uikey      : 'tags', width: '40em',
                             contentMode: ContentMode.HTML])
             }
@@ -137,7 +146,12 @@ class BrowseTab extends SubTree {
     }
 
     private updateBtnClick() {
+        // nur beim ersten mal initialisieren mit ?:
+        toptab = toptab ?: uiComponents['toptab']
+        browseRoot = browseRoot ?: uiComponents['browseTab']
+        captureRoot = captureRoot ?: uiComponents['captureTab']
         cIDto = cIDtos[ciCount]
+        toptab.selectedTab = captureRoot
         captureTab.updateCi(cIDto)
     }
 
@@ -162,9 +176,9 @@ class BrowseTab extends SubTree {
         dtoStr += "<b>Interaktionstyp:</b> ${cIDto.typeOfInteractionId}<br> "
         dtoStr += "<b>Hotspots:</b> ${cIDto.hotspotIds}<br> "
 //        dtoStr += "<b>mediums:</b> ${cIDto.mediums}<br> "
-        if (cIDto.actors){
+        if (cIDto.actors) {
             dtoStr += "<b>actors:</b> "
-            cIDto.actors.each {actor ->
+            cIDto.actors.each { actor ->
                 dtoStr += "${actor}<br>"
             }
         }
@@ -197,7 +211,7 @@ class BrowseTab extends SubTree {
 ////        updater(--mediumCount)
 //    }
 
-    private updater(int counter){
+    private updater(int counter) {
         ciHeader.value = "<b>${cIDtos.header[counter]}</b>"
         ciStory.value = "<b>${cIDtos[counter].mediums[0].story}</b>"
         tags.value = "<b>tags: ${dtoString(cIDtos[counter])}</b>"
