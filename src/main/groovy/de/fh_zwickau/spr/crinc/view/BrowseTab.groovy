@@ -38,6 +38,7 @@ import de.fh_zwickau.spr.crinc.dto.ReferenceDataDto
 import de.fh_zwickau.spr.crinc.dto.TextDto
 import de.fh_zwickau.spr.crinc.service.CriticalIncidentService
 import de.fh_zwickau.spr.crinc.service.ReferenceDataService
+import de.fh_zwickau.spr.crinc.service.UserService
 import de.geobe.util.vaadin.SubTree
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -53,6 +54,8 @@ class BrowseTab extends SubTree {
     private CriticalIncidentService criticalIncidentService
     @Autowired
     private ReferenceDataService referenceDataService
+    @Autowired
+    private UserService userService
 
     CaptureTab captureTab
 
@@ -183,7 +186,7 @@ class BrowseTab extends SubTree {
         dtoStr += cIDto.nonVerbal ? "nonVerbal " : ""
         dtoStr += cIDto.paraverbal ? "paraverbal " : ""
         dtoStr += cIDto.proxematic ? "proxematisch" : ""
-        dtoStr += "]<br><b>Autor:</b> ${cIDto.authorId}<br> "
+        dtoStr += "]<br><b>Autor:</b> ${userService.getUser(cIDto.authorId).name ?: '---'}<br> "
         dtoStr += "<b>Land des Geschehens:</b> " +
                 "${referenceDataDto.country[cIDto.countryOfHappeningId]} <br>"
         dtoStr += "<b>Kontaktfelder:</b> " +

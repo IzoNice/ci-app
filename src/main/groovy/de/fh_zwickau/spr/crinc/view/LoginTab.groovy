@@ -31,8 +31,8 @@ import com.vaadin.spring.annotation.SpringComponent
 import com.vaadin.spring.annotation.UIScope
 import com.vaadin.ui.*
 import com.vaadin.ui.themes.ValoTheme
-import de.fh_zwickau.spr.crinc.domain.User
-import de.fh_zwickau.spr.crinc.service.CriticalIncidentService
+import de.fh_zwickau.spr.crinc.dto.UserDto
+import de.fh_zwickau.spr.crinc.service.UserService
 import de.geobe.util.vaadin.SubTree
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -45,7 +45,7 @@ import static de.geobe.util.vaadin.VaadinBuilder.F
 @UIScope
 class LoginTab extends SubTree {
     @Autowired
-    private CriticalIncidentService criticalIncidentService
+    private UserService userService
 
     private Label loginFailLabel, loggedOutLabel
     private FormLayout form
@@ -57,7 +57,7 @@ class LoginTab extends SubTree {
 
     private Component browseRoot, captureRoot, forumRoot
 
-    private User loggedIn
+    private UserDto loggedIn
     public getLoggedIn() { loggedIn }
 
 
@@ -111,7 +111,7 @@ class LoginTab extends SubTree {
     private void login() {
         def uName = userName.value
         def password = password.value
-        loggedIn = criticalIncidentService.login(uName, password)
+        loggedIn = userService.login(uName, password)
         if (loggedIn.name == uName) {
             Notification.show('Login erfolgreich', "user ${loggedIn.name}",
                     Notification.Type.HUMANIZED_MESSAGE)
@@ -133,7 +133,7 @@ class LoginTab extends SubTree {
     }
 
     private void logout() {
-        loggedIn = new User()
+        loggedIn = new UserDto()
         browseRoot.visible = false
         captureRoot.visible = false
 //            forumRoot.visible = true

@@ -61,19 +61,6 @@ class CriticalIncidentService {
     @Autowired
     private UserRepository userRepository
 
-
-    @Transactional
-    public User login(String uName, def password){
-        User user = userRepository.findByName(uName)
-        if (user){
-            if (user.password == password){
-                return user
-            }
-        }else {
-            return new User()
-        }
-    }
-
     @Transactional
     public List<CriticalIncidentDto> getAllCriticalIncidentDtos(){
         def cIs = criticalIncidentRepository.findAll()
