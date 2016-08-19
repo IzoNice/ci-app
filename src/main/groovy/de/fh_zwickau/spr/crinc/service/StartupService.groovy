@@ -174,6 +174,7 @@ Die zweite Fallgeschichte ist mit meinem Freund passiert,
             citxt.language.add(langDE)
             ci.countryOfHappening.add(cntryBG)
             ci.mediums.add(citxt)
+            citxt.storyType = Text.StoryType.PRIMARY_FIRST_PERSON
             ci.author.add(ciAuthor)
             def actor1 = new Actor()
             def actor2 = new Actor()

@@ -31,7 +31,6 @@ import com.vaadin.spring.annotation.SpringComponent
 import com.vaadin.spring.annotation.UIScope
 import com.vaadin.ui.*
 import de.fh_zwickau.spr.crinc.dto.*
-import de.fh_zwickau.spr.crinc.service.ReferenceDataService
 import de.fh_zwickau.spr.crinc.view.helper.ActorData
 import de.fh_zwickau.spr.crinc.view.helper.ReferenceData
 import de.geobe.util.vaadin.SubTree
@@ -175,7 +174,7 @@ class CaptureCategoriesView extends SubTree {
 
         actorsOrigin = uiComponents['capture.categories.actorsOrigin']
         actorsLbl = uiComponents['capture.categories.actorsLbl']
-        actorsLbl.setValue('<b>Wer sind die Akteure?<b/>')
+        actorsLbl.setValue('<b>Woher/wer sind die Akteure?<b/>')
         browseTab.referenceDataDto.actorsOrigin.each { k, v ->
             actorsOrigin.addItem(k)
             actorsOrigin.setItemCaption(k, v)
@@ -193,7 +192,7 @@ class CaptureCategoriesView extends SubTree {
 
         fieldOfContact = uiComponents['capture.categories.fieldOfContact']
         fieldOfContactLbl = uiComponents['capture.categories.fieldOfContactLbl']
-        fieldOfContactLbl.setValue('<b>Kontaktfelder?<b/>')
+        fieldOfContactLbl.setValue('<b>Kontaktfelder<b/>')
         browseTab.referenceDataDto.fieldOfContact.each { k, v ->
             fieldOfContact.addItem(k)
             fieldOfContact.setItemCaption(k, v)
@@ -226,8 +225,12 @@ class CaptureCategoriesView extends SubTree {
 
     private addActor() {
         def actorTypeId = actorType.value
-        def actorTypeCaption = actorType.getItemCaption(actorTypeId)
         def originId = actorsOrigin.value
+        actorsSetter(actorTypeId, originId)
+    }
+
+    private void actorsSetter(actorTypeId, originId) {
+        def actorTypeCaption = actorType.getItemCaption(actorTypeId)
         def originCaption = actorsOrigin.getItemCaption(originId)
         ActorData actorData = new ActorData(originId: originId, origin: originCaption,
                 actorTypeId: actorTypeId, actorType: actorTypeCaption)
@@ -240,6 +243,10 @@ class CaptureCategoriesView extends SubTree {
 
     private addContactField() {
         def contactId = fieldOfContact.value
+        contactFieldsSetter(contactId)
+    }
+
+    private void contactFieldsSetter(contactId) {
         def contactCaption = fieldOfContact.getItemCaption(contactId)
         ReferenceData contactData = new ReferenceData(id: contactId, caption: contactCaption)
         fieldsOfContact.addItem([contactData].toArray(), null)
@@ -251,6 +258,10 @@ class CaptureCategoriesView extends SubTree {
 
     private addHotspot() {
         def hotspotId = hotspot.value
+        hotspotSetter(hotspotId)
+    }
+
+    private void hotspotSetter(hotspotId) {
         def hotspotCaption = hotspot.getItemCaption(hotspotId)
         ReferenceData hotspotData = new ReferenceData(id: hotspotId, caption: hotspotCaption)
         hotspots.addItem([hotspotData].toArray(), null)
@@ -322,15 +333,14 @@ class CaptureCategoriesView extends SubTree {
         paraverbal.setValue(cIDto.paraverbal)
         proxematic.setValue(cIDto.proxematic)
 
-//        browseTab.referenceDataDto.
         cIDto.actors.each { actor ->
-//            actors.addItem(actor.actorTypeId(value) aus actor.originId(value))
+            actorsSetter(actor.actorTypeId, actor.originId)
         }
         cIDto.fieldOfContactIds.each { focId ->
-//            fieldsOfContact.addItem(focId(value))
+            contactFieldsSetter(focId)
         }
         cIDto.hotspotIds.each { hotspotId ->
-//            hotspots.addItem(hotspotId(value))
+            hotspotSetter(hotspotId)
         }
     }
 }

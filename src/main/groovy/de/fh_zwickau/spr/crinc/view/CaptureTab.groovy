@@ -55,7 +55,8 @@ class CaptureTab extends SubTree {
 //    @Autowired
 //    private ForumTab forumTab
 
-    private Component categoriesRoot
+    private Component categoriesRoot, browseRoot
+    private TabSheet toptab
     private boolean categoriesVisible = false
     private Label headerFieldLabel, storyAreaLabel
     private TextField headerField
@@ -134,6 +135,9 @@ class CaptureTab extends SubTree {
     }
 
     private updateButtonClick() {
+        // nur beim ersten mal initialisieren mit ?:
+        toptab = toptab ?: uiComponents['toptab']
+        browseRoot = browseRoot ?: uiComponents['browseTab']
         CriticalIncidentDto ciDto = new CriticalIncidentDto()
         ciDto.authorId = updateDtoAuthorId
         ciDto.id = updateDtoId
@@ -144,7 +148,9 @@ class CaptureTab extends SubTree {
         criticalIncidentService.createOrUpdate(ciDto)
         saveButton.visible = true
         updateButton.visible = false
+        browseTab.refreshCi(ciDto)
         resetFields()
+        toptab.selectedTab = browseRoot
     }
 
     private escButtonClick() {

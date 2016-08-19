@@ -159,6 +159,19 @@ class BrowseTab extends SubTree {
         cIDtos = criticalIncidentService.getAllCriticalIncidentDtos()
     }
 
+    public void refreshCi(CriticalIncidentDto ciDto) {
+        def id = ciDto.id
+        for (int i = 0; i < cIDtos.size(); i++) {
+            if(cIDtos[i].id == id) {
+                cIDtos[i] = ciDto
+                if(ciCount == i) {
+                    updater(ciCount)
+                }
+                break
+            }
+        }
+    }
+
     private String dtoString(CriticalIncidentDto cIDto) {
         String dtoStr = ''
         dtoStr += "<b>Origin:</b> ${cIDto.ciOrigin}<br> "
