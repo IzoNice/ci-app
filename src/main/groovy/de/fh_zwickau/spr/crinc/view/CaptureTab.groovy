@@ -70,22 +70,29 @@ class CaptureTab extends SubTree {
     @Override
     Component build() {
         categoriesRoot = captureCategoriesView.buildSubtree(vaadin, 'categories.')
-        def c = vaadin."$C.hlayout"('erfassen', [uikey: 'categoriesLayout', spacing: true, margin: false,
-                                                 width  : '45em']) {
+        def c = vaadin."$C.hlayout"('erfassen',
+                [uikey: 'categoriesLayout', spacing: true, margin: false,
+                 width: '45em']) {
             "$C.vlayout"([spacing: true, margin: true]) {
                 "$F.label"([uikey: 'headerFieldLabel', contentMode: ContentMode.HTML])
                 "$F.text"([uikey: 'headerField', width: '40em'])
                 "$F.label"([uikey: 'storyAreaLabel', contentMode: ContentMode.HTML])
                 "$F.textarea"([uikey: 'storyArea', width: '40em'])
-                "$F.checkbox"('categories', [uikey              : 'categoriesBox', margin: false, value: false,
+                "$F.checkbox"('categories', [uikey              : 'categoriesBox', margin: false,
+                                             value: false,
                                              valueChangeListener: { categoriesBoxCheck() }])
-                "$F.subtree"(categoriesRoot, [uikey: 'categoriesArea', visible: false, gridPosition: [0, 0]])
+                "$F.subtree"(categoriesRoot,
+                        [uikey: 'categoriesArea', visible: false, gridPosition: [0, 0]])
                 "$C.hlayout"([uikey : 'buttonArea', spacing: true,
                               margin: false, alignment: Alignment.BOTTOM_LEFT]) {
-                    "$F.button"('Speichern', [uikey: 'saveButton', clickListener: { saveButtonClick() }])
-                    "$F.button"('Bearbeitung Speichern', [uikey: 'updateButton',
-                                                          visible: false, clickListener: { updateButtonClick() }])
-                    "$F.button"('Abbrechen', [uikey: 'escButton', clickListener: { escButtonClick() }])
+                    "$F.button"('Speichern',
+                            [uikey: 'saveButton', clickListener: { saveButtonClick() }])
+                    "$F.button"('Übernehmen', [uikey  : 'updateButton',
+                                               visible: false, clickListener: {
+                        updateButtonClick()
+                    }])
+                    "$F.button"('Abbrechen',
+                            [uikey: 'escButton', clickListener: { escButtonClick() }])
                 }
             }
         }
@@ -102,10 +109,10 @@ class CaptureTab extends SubTree {
         escButton = uiComponents['capture.escButton']
         categoriesBox = uiComponents['capture.categoriesBox']
         headerFieldLabel = uiComponents['capture.headerFieldLabel']
-        headerFieldLabel.value = "<b>header</b>"
+        headerFieldLabel.value = "<b>Titel</b>"
         headerField = uiComponents['capture.headerField']
         storyAreaLabel = uiComponents['capture.storyAreaLabel']
-        storyAreaLabel.value = "<b>story</b>"
+        storyAreaLabel.value = "<b>Langtext</b>"
         storyArea = uiComponents['capture.storyArea']
     }
 
@@ -155,6 +162,10 @@ class CaptureTab extends SubTree {
 
     private escButtonClick() {
         resetFields()
+        // nur beim ersten mal initialisieren mit ?:
+        toptab = toptab ?: uiComponents['toptab']
+        browseRoot = browseRoot ?: uiComponents['browseTab']
+        toptab.selectedTab = browseRoot
     }
 
     private resetFields() {
@@ -163,12 +174,12 @@ class CaptureTab extends SubTree {
         captureCategoriesView.resetFields()
     }
 
-    public updateCi(CriticalIncidentDto cIDto){
+    public updateCi(CriticalIncidentDto cIDto) {
         resetFields()
         updateDtoId = cIDto.id
         updateDtoAuthorId = cIDto.authorId
         headerField.value = cIDto.header
-        storyArea.value = cIDto.mediums[0].story
+        storyArea.value = ((TextDto) cIDto.mediums[0]).story.trim()
         captureCategoriesView.updateCiCategories(cIDto)
         saveButton.visible = false
         updateButton.visible = true

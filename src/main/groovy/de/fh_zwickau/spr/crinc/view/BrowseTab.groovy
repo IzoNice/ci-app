@@ -32,8 +32,10 @@ import com.vaadin.ui.Component
 import com.vaadin.ui.Label
 import com.vaadin.ui.TabSheet
 import com.vaadin.ui.themes.Reindeer
+import de.fh_zwickau.spr.crinc.domain.Text
 import de.fh_zwickau.spr.crinc.dto.CriticalIncidentDto
 import de.fh_zwickau.spr.crinc.dto.ReferenceDataDto
+import de.fh_zwickau.spr.crinc.dto.TextDto
 import de.fh_zwickau.spr.crinc.service.CriticalIncidentService
 import de.fh_zwickau.spr.crinc.service.ReferenceDataService
 import de.geobe.util.vaadin.SubTree
@@ -141,7 +143,7 @@ class BrowseTab extends SubTree {
         ciStory = uiComponents['browse.ciStory']
         ciStory.value = "<b>${cIDtos[ciCount].mediums[0].story}</b>"
         updateBtn = uiComponents['browse.updateBtn']
-        tags.value = "<b>tags: ${dtoString(cIDtos[ciCount])}</b>"
+        tags.value = "<b>Attribute: ${dtoString(cIDtos[ciCount])}</b>"
         updateBtn.setStyleName(Reindeer.BUTTON_LINK)
     }
 
@@ -162,9 +164,9 @@ class BrowseTab extends SubTree {
     public void refreshCi(CriticalIncidentDto ciDto) {
         def id = ciDto.id
         for (int i = 0; i < cIDtos.size(); i++) {
-            if(cIDtos[i].id == id) {
+            if (cIDtos[i].id == id) {
                 cIDtos[i] = ciDto
-                if(ciCount == i) {
+                if (ciCount == i) {
                     updater(ciCount)
                 }
                 break
@@ -174,25 +176,28 @@ class BrowseTab extends SubTree {
 
     private String dtoString(CriticalIncidentDto cIDto) {
         String dtoStr = ''
-        dtoStr += "<b>Origin:</b> ${cIDto.ciOrigin}<br> "
-        if (cIDto.verbal)
-            dtoStr += "<b>verbal:</b> ${cIDto.verbal}<br> "
-        if (cIDto.nonVerbal)
-            dtoStr += "<b>nonVerbal:</b> ${cIDto.nonVerbal}<br> "
-        if (cIDto.paraverbal)
-            dtoStr += "<b>paraverbal:</b> ${cIDto.paraverbal}<br> "
-        if (cIDto.proxematic)
-            dtoStr += "<b>proxematisch:</b> ${cIDto.proxematic}<br> "
-        dtoStr += "<b>Autor:</b> ${cIDto.authorId}<br> "
-        dtoStr += "<b>Land des Geschehens:</b> ${cIDto.countryOfHappeningId} <br>"
-        dtoStr += "<b>Kontaktfelder:</b> ${cIDto.fieldOfContactIds}<br> "
-        dtoStr += "<b>Interaktionstyp:</b> ${cIDto.typeOfInteractionId}<br> "
-        dtoStr += "<b>Hotspots:</b> ${cIDto.hotspotIds}<br> "
+        dtoStr += "<br><b>Texttyp:</b> ${((TextDto)cIDto.mediums[0]).storyType}<br>"
+        dtoStr += "<b>Sprache:</b> ${referenceDataDto.language[cIDto.mediums[0].languageId]}<br> "
+        dtoStr += "<b>Kommunikationsebenen:</b> ["
+        dtoStr += cIDto.verbal ? "verbal " : ""
+        dtoStr += cIDto.nonVerbal ? "nonVerbal " : ""
+        dtoStr += cIDto.paraverbal ? "paraverbal " : ""
+        dtoStr += cIDto.proxematic ? "proxematisch" : ""
+        dtoStr += "]<br><b>Autor:</b> ${cIDto.authorId}<br> "
+        dtoStr += "<b>Land des Geschehens:</b> " +
+                "${referenceDataDto.country[cIDto.countryOfHappeningId]} <br>"
+        dtoStr += "<b>Kontaktfelder:</b> " +
+                "${cIDto.fieldOfContactIds.collect { referenceDataDto.fieldOfContact[it] }}<br> "
+        dtoStr += "<b>Interaktionstyp:</b> " +
+                "${cIDto.typeOfInteractionId.collect{referenceDataDto.typeOfInteraction[it]}.flatten()}<br> "
+        dtoStr += "<b>Hotspots:</b> " +
+                "${cIDto.hotspotIds.collect {referenceDataDto.hotspot[it]}}<br> "
 //        dtoStr += "<b>mediums:</b> ${cIDto.mediums}<br> "
         if (cIDto.actors) {
-            dtoStr += "<b>actors:</b> "
+            dtoStr += "<b>Akteure:</b><br>"
             cIDto.actors.each { actor ->
-                dtoStr += "${actor}<br>"
+                dtoStr += "&nbsp;&nbsp;-&nbsp;${referenceDataDto.actorType[actor.actorTypeId]} aus "+
+                        "${referenceDataDto.actorsOrigin[actor.originId]}<br>"
             }
         }
 //        String mediums = ''
