@@ -64,14 +64,17 @@ class StartupService implements IStartupService {
     @Override
     @Transactional
     void initApplicationData() {
-        criticalIncidentRepository.deleteAll()
-        originRepository.deleteAll()
-        mediumRepository.deleteAll()
-        actorTypeRepository.deleteAll()
-        fieldOfContactRepository.deleteAll()
-        typeOfInteractionRepository.deleteAll()
-        hotspotRepository.deleteAll()
+        if(userRepository.count() > 0)
+            isInitialized = true
         if (!isInitialized) {
+            criticalIncidentRepository.deleteAll()
+            originRepository.deleteAll()
+            mediumRepository.deleteAll()
+            actorTypeRepository.deleteAll()
+            fieldOfContactRepository.deleteAll()
+            typeOfInteractionRepository.deleteAll()
+            hotspotRepository.deleteAll()
+            userRepository.deleteAll()
             log.info("initializing data at ${LocalDateTime.now()}")
             ['Deutschland', 'Spanien', 'Frankreich', 'Russland', 'Algerien', 'Jordanien',
              'Slowenien', 'Albanien', 'Griechenland', 'Türkei', 'Rumänien', 'Georgien',
@@ -141,10 +144,10 @@ class StartupService implements IStartupService {
 
             def usr0 = new User([name: 'Doris', password: 'C1M8st3r'])
             userRepository.saveAndFlush(usr0)
-            def usr1 = new User([name: 'FFK', password: 'Ding'])
-            userRepository.saveAndFlush(usr1)
-            def usr2 = new User([name: 'Christoph', password: 'Ding'])
-            userRepository.saveAndFlush(usr2)
+//            def usr1 = new User([name: 'FFK', password: 'Ding'])
+//            userRepository.saveAndFlush(usr1)
+//            def usr2 = new User([name: 'Christoph', password: 'Ding'])
+//            userRepository.saveAndFlush(usr2)
             def usr3 = new User([name: 'a', password: 'a'])
             userRepository.saveAndFlush(usr3)
 

@@ -165,6 +165,8 @@ class BrowseTab extends SubTree {
     }
 
     public void refreshCi(CriticalIncidentDto ciDto) {
+//        allCis()
+//        updater(ciCount)
         def id = ciDto.id
         for (int i = 0; i < cIDtos.size(); i++) {
             if (cIDtos[i].id == id) {
@@ -209,15 +211,25 @@ class BrowseTab extends SubTree {
     }
 
     private nextCiButtonClick(def it) {
+        checkChanges()
         if (ciCount == cIDtos.size() - 1)
             ciCount = -1
         updater(++ciCount)
     }
 
     private lastCiButtonClick(def it) {
+        checkChanges()
         if (ciCount.abs() == cIDtos.size())
             ciCount = 0
         updater(--ciCount)
+    }
+
+    private void checkChanges() {
+        int count = criticalIncidentService.ciCount
+        if (count != cIDtos.size())
+            allCis()
+        if(ciCount >= count)
+            ciCount = count - 1
     }
 
 //    private nextMediumButtonClick(def it) {

@@ -28,11 +28,18 @@ package de.fh_zwickau.spr.crinc
 
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.builder.SpringApplicationBuilder
+import org.springframework.boot.context.web.SpringBootServletInitializer
 
 @SpringBootApplication
-class CriticalIncidentsApplication {
+class CriticalIncidentsApplication extends SpringBootServletInitializer {
 
     static void main(String[] args) {
         SpringApplication.run CriticalIncidentsApplication, args
+    }
+
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+        return builder.sources(CriticalIncidentsApplication.class);
     }
 }

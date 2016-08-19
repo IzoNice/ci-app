@@ -76,59 +76,94 @@ class CaptureCategoriesView extends SubTree {
                   levelOfCommunicationLbl, fieldOfContactLbl, hotspotLbl
 
 
-
     @Override
     Component build() {
         def c = vaadin."$C.csslayout"([spacing: false, margin: false]) {
 
             "$C.gridlayout"([spacing: false, margin: true, columns: 1, rows: 2]) {
-                "$F.label"([uikey      : 'storyTypeLbl', contentMode: ContentMode.HTML, gridPosition: [0, 0]])
-                "$F.optiongroup"([uikey       : 'storyType', gridPosition: [0, 1]])
+                "$F.label"(
+                        [uikey: 'storyTypeLbl', contentMode: ContentMode.HTML, gridPosition: [0,
+                                                                                              0]])
+                "$F.optiongroup"([uikey: 'storyType', gridPosition: [0, 1]])
             }
 
             "$C.gridlayout"([spacing: false, margin: true, columns: 1, rows: 2]) {
-                "$F.label"([uikey      : 'languageOfNarrationLbl', contentMode: ContentMode.HTML, gridPosition: [0, 0]])
-                "$F.combo"([uikey  : 'languageOfNarration', gridPosition: [0, 1]])
+                "$F.label"(
+                        [uikey       : 'languageOfNarrationLbl', contentMode: ContentMode.HTML,
+                         gridPosition: [0, 0]])
+                "$F.combo"([uikey: 'languageOfNarration', gridPosition: [0, 1]])
             }
 
             "$C.gridlayout"([spacing: false, margin: true, columns: 1, rows: 2]) {
-                "$F.label"([uikey      : 'typeOfInteractionLbl', contentMode: ContentMode.HTML, gridPosition: [0, 0]])
-                "$F.combo"([uikey              : 'typeOfInteraction', gridPosition       : [0, 1], visible: true])
+                "$F.label"(
+                        [uikey       : 'typeOfInteractionLbl', contentMode: ContentMode.HTML,
+                         gridPosition: [0, 0]])
+                "$F.combo"([uikey: 'typeOfInteraction', gridPosition: [0, 1], visible: true])
             }
 
             "$C.gridlayout"([spacing: false, margin: true, columns: 1, rows: 2]) {
-                "$F.label"([uikey      : 'countryOfHappeningLbl', contentMode: ContentMode.HTML, gridPosition: [0, 0]])
-                "$F.combo"([uikey  : 'countryOfHappening', gridPosition: [0, 1]])
+                "$F.label"(
+                        [uikey       : 'countryOfHappeningLbl', contentMode: ContentMode.HTML,
+                         gridPosition: [0, 0]])
+                "$F.combo"([uikey: 'countryOfHappening', gridPosition: [0, 1]])
             }
 
             "$C.gridlayout"([spacing: false, margin: true, columns: 3, rows: 3]) {
-                "$F.label"([uikey      : 'actorsLbl', contentMode: ContentMode.HTML, gridPosition: [0, 0, 2, 0]])
-                "$F.combo"([uikey  : 'actorsOrigin', gridPosition: [0, 1], visible: true])
-                "$F.combo"([uikey  : 'actorType', gridPosition: [1, 1], visible: true])
-                "$F.button"("+", [uikey  : 'addActor', gridPosition: [2, 1], visible: true, clickListener: { addActor() }])
-                "$F.table"([uikey     : 'actors', width: '100%', selectable: true, valueChangeListener: { removeActor(it) },
-                            height    : '200px', gridPosition: [0, 2, 2, 2]])
+                "$F.label"(
+                        [uikey: 'actorsLbl', contentMode: ContentMode.HTML, gridPosition: [0, 0,
+                                                                                           2, 0]])
+                "$F.combo"([uikey: 'actorsOrigin', gridPosition: [0, 1], visible: true])
+                "$F.combo"([uikey: 'actorType', gridPosition: [1, 1], visible: true])
+                "$F.button"("+",
+                        [uikey: 'addActor', gridPosition: [2, 1], visible: true, clickListener: {
+                            addActor()
+                        }])
+                "$F.table"([uikey              : 'actors', width: '100%', selectable: true,
+                            valueChangeListener: {
+                                removeActor(it)
+                            },
+                            height             : '200px', gridPosition: [0, 2, 2, 2]])
             }
             "$C.gridlayout"([spacing: false, margin: true, columns: 2, rows: 3]) {
-                "$F.label"([uikey      : 'fieldOfContactLbl', contentMode: ContentMode.HTML, gridPosition: [0, 0]])
-                "$F.combo"([uikey  : 'fieldOfContact', gridPosition: [0, 1]])
-                "$F.button"("+", [uikey  : 'addFieldOfContact', gridPosition: [1, 1], clickListener: { addContactField() }])
-                "$F.table"([uikey     : 'fieldsOfContact', width: '100%', selectable: true, valueChangeListener: { removeContactField(it) },
-                         height    : '200px', gridPosition: [0, 2, 1, 2]])
+                "$F.label"(
+                        [uikey: 'fieldOfContactLbl', contentMode: ContentMode.HTML, gridPosition:
+                                [0, 0]])
+                "$F.combo"([uikey: 'fieldOfContact', gridPosition: [0, 1]])
+                "$F.button"("+", [uikey: 'addFieldOfContact', gridPosition: [1, 1], clickListener: {
+                    addContactField()
+                }])
+                "$F.table"(
+                        [uikey              : 'fieldsOfContact', width: '100%', selectable: true,
+                         valueChangeListener: {
+                             removeContactField(it)
+                         },
+                         height             : '200px', gridPosition: [0, 2, 1, 2]])
             }
             "$C.gridlayout"([spacing: false, margin: true, columns: 2, rows: 3]) {
-                "$F.label"([uikey      : 'hotspotLbl', contentMode: ContentMode.HTML, gridPosition: [0, 0]])
-                "$F.combo"([uikey  : 'hotspot', gridPosition: [0, 1],])
-                "$F.button"("+", [uikey: 'addHotspot', gridPosition: [1, 1], clickListener: {addHotspot() }])
-                "$F.table"([uikey: 'hotspots', width: '100%', selectable: true, valueChangeListener: { removeHotspot(it) },
-                            height: '200px', gridPosition: [0, 2, 1, 2]])
+                "$F.label"(
+                        [uikey: 'hotspotLbl', contentMode: ContentMode.HTML, gridPosition: [0, 0]])
+                "$F.combo"([uikey: 'hotspot', gridPosition: [0, 1],])
+                "$F.button"("+", [uikey: 'addHotspot', gridPosition: [1, 1], clickListener: {
+                    addHotspot()
+                }])
+                "$F.table"(
+                        [uikey : 'hotspots', width: '100%', selectable: true, valueChangeListener: {
+                            removeHotspot(it)
+                        },
+                         height: '200px', gridPosition: [0, 2, 1, 2]])
             }
-            "$C.gridlayout"([spacing: false, margin : true, columns: 1, rows   : 5]) {
-                "$F.label"([uikey      : 'levelOfCommunicationLbl', contentMode: ContentMode.HTML, gridPosition: [0, 0]])
-                "$F.checkbox"('verbal', [uikey       : 'verbal', margin: true, gridPosition: [0, 1], value: false])
-                "$F.checkbox"('non-verbal', [uikey       : 'nonVerbal', margin: true, gridPosition: [0, 2], value: false])
-                "$F.checkbox"('paraverbal', [uikey       : 'paraverbal', margin: true, gridPosition: [0, 3], value: false])
-                "$F.checkbox"('proxematisch', [uikey       : 'proxematic', margin: true, gridPosition: [0, 4], value: false])
+            "$C.gridlayout"([spacing: false, margin: true, columns: 1, rows: 5]) {
+                "$F.label"(
+                        [uikey       : 'levelOfCommunicationLbl', contentMode: ContentMode.HTML,
+                         gridPosition: [0, 0]])
+                "$F.checkbox"('verbal',
+                        [uikey: 'verbal', margin: true, gridPosition: [0, 1], value: false])
+                "$F.checkbox"('non-verbal',
+                        [uikey: 'nonVerbal', margin: true, gridPosition: [0, 2], value: false])
+                "$F.checkbox"('paraverbal',
+                        [uikey: 'paraverbal', margin: true, gridPosition: [0, 3], value: false])
+                "$F.checkbox"('proxematisch',
+                        [uikey: 'proxematic', margin: true, gridPosition: [0, 4], value: false])
             }
         }
         init()
@@ -230,6 +265,8 @@ class CaptureCategoriesView extends SubTree {
     }
 
     private void actorsSetter(actorTypeId, originId) {
+        if (!actorTypeId || !originId)
+            return
         def actorTypeCaption = actorType.getItemCaption(actorTypeId)
         def originCaption = actorsOrigin.getItemCaption(originId)
         ActorData actorData = new ActorData(originId: originId, origin: originCaption,
@@ -247,6 +284,8 @@ class CaptureCategoriesView extends SubTree {
     }
 
     private void contactFieldsSetter(contactId) {
+        if (!contactId)
+            return
         def contactCaption = fieldOfContact.getItemCaption(contactId)
         ReferenceData contactData = new ReferenceData(id: contactId, caption: contactCaption)
         fieldsOfContact.addItem([contactData].toArray(), null)
@@ -262,6 +301,8 @@ class CaptureCategoriesView extends SubTree {
     }
 
     private void hotspotSetter(hotspotId) {
+        if (!hotspotId)
+            return
         def hotspotCaption = hotspot.getItemCaption(hotspotId)
         ReferenceData hotspotData = new ReferenceData(id: hotspotId, caption: hotspotCaption)
         hotspots.addItem([hotspotData].toArray(), null)
@@ -285,7 +326,8 @@ class CaptureCategoriesView extends SubTree {
         }
         def hotspotIds = hotspots.itemIds
         hotspotIds.each { hotspotId ->
-            ReferenceData hotspotData = hotspots.getItem(hotspotId).getItemProperty("Hotspots").value
+            ReferenceData hotspotData = hotspots.getItem(hotspotId).
+                    getItemProperty("Hotspots").value
             criticalIncidentDto.hotspotIds << hotspotData.id
         }
         def actorIds = actors.itemIds
@@ -299,13 +341,13 @@ class CaptureCategoriesView extends SubTree {
 
         MediumDto mediumDto = criticalIncidentDto?.mediums[0]
         mediumDto.languageId = languageOfNarration.value
-        if(mediumDto instanceof TextDto) {
+        if (mediumDto instanceof TextDto) {
             mediumDto.storyType = storyType.value
         }
 //        resetFields()
     }
 
-    public resetFields(){
+    public resetFields() {
         storyType.value = null
         languageOfNarration.value = null
         typeOfInteraction.value = null
@@ -323,7 +365,7 @@ class CaptureCategoriesView extends SubTree {
         hotspots.removeAllItems()
     }
 
-    public updateCiCategories(CriticalIncidentDto cIDto){
+    public updateCiCategories(CriticalIncidentDto cIDto) {
         storyType.value = cIDto.mediums[0].storyType
         languageOfNarration.value = cIDto.mediums[0].languageId
         typeOfInteraction.value = cIDto.typeOfInteractionId

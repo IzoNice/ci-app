@@ -52,7 +52,7 @@ class LoginTab extends SubTree {
     private TextField userName
     private PasswordField password
     private Button login
-    private VerticalLayout loginLayout, logoutLayout
+    private VerticalLayout loginLayout, logoutLayout, loginLogoutLayout
     private TabSheet toptab
 
     private Component browseRoot, captureRoot, forumRoot
@@ -101,6 +101,7 @@ class LoginTab extends SubTree {
         loggedOutLabel = uiComponents['login.loggedOutLabel']
         loginLayout = uiComponents['login.loginLayout']
         logoutLayout = uiComponents['login.logoutLayout']
+        loginLogoutLayout = uiComponents['login.loginLogoutLayout']
 
         form = uiComponents['login.form']
         userName = uiComponents['login.userName']
@@ -109,10 +110,10 @@ class LoginTab extends SubTree {
     }
 
     private void login() {
-        def uName = userName.value
-        def password = password.value
-        loggedIn = userService.login(uName, password)
-        if (loggedIn.name == uName) {
+//        def uName = userName.value
+//        def password = password.value
+        loggedIn = userService.login(new UserDto(name: userName.value, password: password.value))
+        if (loggedIn?.id) {
             Notification.show('Login erfolgreich', "user ${loggedIn.name}",
                     Notification.Type.HUMANIZED_MESSAGE)
             toptab = uiComponents['toptab']
@@ -126,8 +127,9 @@ class LoginTab extends SubTree {
             loginLayout.visible = false
             logoutLayout.visible = true
             toptab.selectedTab = browseRoot
+            toptab.getTab(0).caption = 'Logout'
         } else {
-            Notification.show('Login Fehler', "user ${loggedIn.name}",
+            Notification.show('Login Fehler', "user ${userName.value}",
                     Notification.Type.HUMANIZED_MESSAGE)
         }
     }
@@ -140,5 +142,6 @@ class LoginTab extends SubTree {
 
         loginLayout.visible = true
         logoutLayout.visible = false
+        toptab.getTab(0).caption = 'Login'
     }
 }

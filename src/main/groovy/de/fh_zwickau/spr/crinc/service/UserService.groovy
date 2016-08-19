@@ -41,10 +41,10 @@ class UserService {
     private UserRepository userRepository
 
     @Transactional
-    public UserDto login(String uName, def password) {
-        User user = userRepository.findByName(uName)
+    public UserDto login(UserDto userDto) {
+        User user = userRepository.findByName(userDto.name)
         if (user) {
-            if (user.password == password) {
+            if (user.password == userDto.password) {
                 // password niemals an die GUI senden
                 return new UserDto(id: user.id, name: user.name, password: '')
             }

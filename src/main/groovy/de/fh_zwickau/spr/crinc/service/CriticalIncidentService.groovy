@@ -146,6 +146,11 @@ class CriticalIncidentService {
     }
 
     @Transactional
+    public int getCiCount() {
+        criticalIncidentRepository.count()
+    }
+
+    @Transactional
     public CriticalIncidentDto createOrUpdate(CriticalIncidentDto cIDto) {
         CriticalIncident cI
 

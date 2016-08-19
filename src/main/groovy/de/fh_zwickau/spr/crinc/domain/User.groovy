@@ -32,6 +32,7 @@ import de.geobe.util.association.ToMany
 import javax.persistence.*
 
 @Entity
+@Table(name='t_user')
 class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
